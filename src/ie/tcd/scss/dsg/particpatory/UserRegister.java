@@ -9,8 +9,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -26,6 +24,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -44,7 +44,7 @@ public class UserRegister extends Activity {
 	private AppContext context;
 	private Location local;
 	private LocationManager locationManager;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -118,16 +118,18 @@ public class UserRegister extends Activity {
 	@SuppressLint("NewApi")
 	private OnClickListener userRegisterButtonListener = new OnClickListener() {
 
+		@SuppressLint("CommitPrefEdits")
 		@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 		@Override
 		public void onClick(View v) {
 			EditText nickName = (EditText) findViewById(R.id.userName);
-			context.setNickName(nickName.getText().toString());
+			SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
+			
+			Log.d(TAG, "nickName:"+nickName);
 			if ((local != null) && local.hasAccuracy()
 					&& (local.getAccuracy() <= 50)) {
 				Log.d(TAG, "get location good enough");
 				Log.d(TAG, local.getAccuracy() + "");
-				Log.d(TAG, local.getLatitude() + "=latitude");
 
 				String url = "http://10.6.33.177:8888/newuser";
 				if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -141,6 +143,23 @@ public class UserRegister extends Activity {
 					User user= createNewUser(local);
 					Gson gson = new Gson();
 					String json = gson.toJson(user);
+					//put into context
+					context.setNickName(nickName.getText().toString());
+					context.setAcceptPercent(user.getAcceptPercent());
+					context.setAverCycleSpeed(user.getAverCycleSpeed());
+					context.setAverDriveSpeed(user.getAverDriveSpeed());
+					context.setAverWalkSpeed(user.getAverWalkSpeed());
+					context.setMode(user.getMode());
+					
+					//save into sharedPreference
+					Editor editor = shared.edit();
+					editor.putString("nickName", nickName.getText().toString());
+					editor.putFloat("accept", user.getAcceptPercent());
+					editor.putFloat("cycle", user.getAverCycleSpeed());
+					editor.putFloat("drive", user.getAverDriveSpeed());
+					editor.putFloat("walk", user.getAverWalkSpeed());
+					editor.putString("mode", user.getMode());
+					
 					StringEntity entity = new StringEntity(json, "UTF-8");
 					entity.setContentType("application/json");
 					request.setEntity(entity);
@@ -152,7 +171,12 @@ public class UserRegister extends Activity {
 								.getEntity());
 						Log.d(TAG, "get results back");
 						context.setUserId(result);
+						editor.putString("userId", result);
+						editor.commit();
 						
+						//jump into UserProfile
+						Intent userProfile = new Intent(getApplicationContext(), UserProfile.class);
+						startActivity(userProfile);
 					} else {
 						Log.d(TAG, "failed");
 					}

@@ -61,6 +61,7 @@
         <activity android:name="UserRegister" >
         </activity>
         <activity android:name="Welcome"></activity>
+        <activity android:name="UserProfile"></activity>
     </application>
 
 </manifest>
