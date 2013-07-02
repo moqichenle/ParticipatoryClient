@@ -1,41 +1,44 @@
 package ie.tcd.scss.dsg.particpatory;
 
+import ie.tcd.scss.dsg.po.User;
 import android.app.Application;
-import android.location.Location;
 
 public class AppContext extends Application {
-	private static final String TAG = "AppContext";
-	private Location location;
-	private String registerId;// user registered id in GCM.
-	private String userId;// user's Id in database, Long type
-
+//	private static final String TAG = "AppContext";
+	private String userId;//added user into the database
+	private String registeredId;//registered to GCM
+	private User user;
+	private String nickName;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 	}
-
-	public Location getLocation() {
-		return location;
+	public User getUser() {
+		return user;
 	}
-
-	public void setLocation(Location location) {
-		this.location = location;
+	public void setUser(User user) {
+		this.user = user;
 	}
-
-	public String getRegisterId() {
-		return registerId;
-	}
-
-	public void setRegisterId(String registerId) {
-		this.registerId = registerId;
-	}
-
 	public String getUserId() {
 		return userId;
 	}
-
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
+	public String getRegisteredId() {
+		return registeredId;
+	}
+	public void setRegisteredId(String registeredId) {
+		this.registeredId = registeredId;
+	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	
 
 }

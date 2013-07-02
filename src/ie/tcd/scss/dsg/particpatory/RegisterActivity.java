@@ -197,11 +197,11 @@ public class RegisterActivity extends Activity {
 		Button registerButton = (Button) findViewById(R.id.regButton);
 		switch (newState) {
 		case REGISTERED:
-			// registerButton.setText("Unregister");
-			// registerButton.setOnTouchListener(unregisterListener);
-			// registerButton.setEnabled(true);
-			Intent intent = new Intent(this, UserRegister.class);
-			startActivity(intent);
+			 registerButton.setText("Unregister");
+			 registerButton.setOnTouchListener(unregisterListener);
+			 registerButton.setEnabled(true);
+//			Intent intent = new Intent(this, UserRegister.class);
+//			startActivity(intent);
 			break;
 
 		case REGISTERING:

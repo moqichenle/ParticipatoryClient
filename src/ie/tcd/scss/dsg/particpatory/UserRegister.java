@@ -121,9 +121,10 @@ public class UserRegister extends Activity {
 		@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
+			EditText nickName = (EditText) findViewById(R.id.userName);
+			context.setNickName(nickName.getText().toString());
 			if ((local != null) && local.hasAccuracy()
-					&& (local.getAccuracy() <= 200)) {
+					&& (local.getAccuracy() <= 50)) {
 				Log.d(TAG, "get location good enough");
 				Log.d(TAG, local.getAccuracy() + "");
 				Log.d(TAG, local.getLatitude() + "=latitude");
@@ -149,8 +150,9 @@ public class UserRegister extends Activity {
 						Log.d(TAG, "request successfully");
 						String result = EntityUtils.toString(response
 								.getEntity());
-						EditText userName = (EditText) findViewById(R.id.userName);
-						userName.setText(result);
+						Log.d(TAG, "get results back");
+						context.setUserId(result);
+						
 					} else {
 						Log.d(TAG, "failed");
 					}

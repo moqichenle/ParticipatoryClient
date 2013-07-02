@@ -60,6 +60,7 @@
             android:launchMode="singleTop" />
         <activity android:name="UserRegister" >
         </activity>
+        <activity android:name="Welcome"></activity>
     </application>
 
 </manifest>
