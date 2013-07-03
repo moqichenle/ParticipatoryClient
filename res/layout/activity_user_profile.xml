@@ -14,28 +14,6 @@
         android:text="NickName:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
-        android:id="@+id/userName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="18dp"
-        android:layout_toRightOf="@+id/textView1"
-        android:ems="10" >
-    </EditText>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/userName"
-        android:layout_marginTop="43dp"
-        android:text="Current Mode:"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
     <TextView
         android:id="@+id/mode"
         android:layout_width="wrap_content"
@@ -74,7 +52,7 @@
         android:layout_alignBaseline="@+id/textView3"
         android:layout_alignBottom="@+id/textView3"
         android:layout_toRightOf="@+id/textView4"
-        android:text=""
+        android:text="0"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -84,7 +62,7 @@
         android:layout_alignLeft="@+id/textView3"
         android:layout_below="@+id/cycle"
         android:layout_marginTop="20dp"
-        android:text="Average Driving speed"
+        android:text="Average Driving speed:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -94,7 +72,7 @@
         android:layout_alignBaseline="@+id/textView5"
         android:layout_alignBottom="@+id/textView5"
         android:layout_alignLeft="@+id/cycle"
-        android:text=""
+        android:text="0"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -104,7 +82,7 @@
         android:layout_alignLeft="@+id/textView5"
         android:layout_below="@+id/drive"
         android:layout_marginTop="21dp"
-        android:text="Acceptance Rate"
+        android:text="Acceptance Rate:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -113,8 +91,9 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/textView6"
         android:layout_alignBottom="@+id/textView6"
+        android:layout_alignLeft="@+id/drive"
         android:layout_alignRight="@+id/drive"
-        android:text=""
+        android:text="0"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -124,8 +103,28 @@
         android:layout_alignBaseline="@+id/textView4"
         android:layout_alignBottom="@+id/textView4"
         android:layout_alignLeft="@+id/cycle"
-        android:text=""
+        android:text="0"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="17dp"
+        android:text="Current Mode:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/textView1"
+        android:layout_alignBottom="@+id/textView1"
+        android:layout_marginLeft="2dp"
+        android:layout_toRightOf="@+id/textView2"
+        android:text="s"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

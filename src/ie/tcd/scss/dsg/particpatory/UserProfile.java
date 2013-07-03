@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -24,8 +23,7 @@ public class UserProfile extends SlidingFragmentActivity {
 		setupSlidingMenu(savedInstanceState);
 		Log.d(TAG, "get User");
 		String nickName = context.getNickName();
-		EditText userName = (EditText) findViewById(R.id.userName);
-		userName.setEnabled(false);
+		TextView userName = (TextView) findViewById(R.id.userName);
 		userName.setText(nickName);
 		TextView mode = (TextView) findViewById(R.id.mode);
 		TextView walk = (TextView) findViewById(R.id.walk);
