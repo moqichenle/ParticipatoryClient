@@ -39,6 +39,8 @@ public class UserProfile extends SlidingFragmentActivity {
 		rate.setText(context.getAcceptPercent() + "");
 	}
 
+	
+
 	private void setupSlidingMenu(Bundle savedInstanceState){
 		
 		setBehindContentView(R.layout.menu_frame);
