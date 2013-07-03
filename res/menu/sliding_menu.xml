@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/profile"
+        android:title="User Profile">
+    </item>
+    <item
+        android:id="@+id/report"
+        android:title="Report">
+    </item>
+    <item
+        android:id="@+id/question"
+        android:title="Question">
+    </item>
+    <item
+        android:id="@+id/task"
+        android:title="Task">
+    </item>
+    <item
+        android:id="@+id/setting"
+        android:title="Settings">
+    </item>
+
+</menu>

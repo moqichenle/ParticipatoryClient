@@ -24,7 +24,6 @@
         android:layout_marginRight="18dp"
         android:layout_toRightOf="@+id/textView1"
         android:ems="10" >
-
     </EditText>
 
     <TextView
@@ -127,5 +126,6 @@
         android:layout_alignLeft="@+id/cycle"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
 
 </RelativeLayout>

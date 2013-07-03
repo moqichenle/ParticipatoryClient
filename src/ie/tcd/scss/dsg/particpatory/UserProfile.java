@@ -1,22 +1,27 @@
 package ie.tcd.scss.dsg.particpatory;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class UserProfile extends Activity {
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
+
+public class UserProfile extends SlidingFragmentActivity {
 	private static final String TAG = "UserProfileActivity";
 	private AppContext context;
+	private ListFragment mFrag;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d(TAG, "load the page");
 		setContentView(R.layout.activity_user_profile);
 		context = (AppContext) getApplicationContext();
-		Log.d(TAG, "load the page");
+		setupSlidingMenu(savedInstanceState);
 		Log.d(TAG, "get User");
 		String nickName = context.getNickName();
 		EditText userName = (EditText) findViewById(R.id.userName);
@@ -28,10 +33,32 @@ public class UserProfile extends Activity {
 		TextView drive = (TextView) findViewById(R.id.drive);
 		TextView rate = (TextView) findViewById(R.id.rate);
 		mode.setText(context.getMode());
-		walk.setText(context.getAverWalkSpeed()+"");
-		cycle.setText(context.getAverCycleSpeed()+"");
-		drive.setText(context.getAverDriveSpeed()+"");
-		rate.setText(context.getAcceptPercent()+"");
+		walk.setText(context.getAverWalkSpeed() + "");
+		cycle.setText(context.getAverCycleSpeed() + "");
+		drive.setText(context.getAverDriveSpeed() + "");
+		rate.setText(context.getAcceptPercent() + "");
 	}
 
+	private void setupSlidingMenu(Bundle savedInstanceState){
+		
+		setBehindContentView(R.layout.menu_frame);
+		if (savedInstanceState == null) {
+			FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
+			mFrag = new SampleListFragment();
+			t.replace(R.id.menu_frame, mFrag);
+			t.commit();
+		} else {
+			mFrag = (ListFragment)this.getSupportFragmentManager().findFragmentById(R.id.menu_frame);
+		}
+		
+		// customize the SlidingMenu
+		SlidingMenu sm = getSlidingMenu();
+		sm.setShadowWidthRes(R.dimen.shadow_width);
+		sm.setShadowDrawable(R.drawable.shadow);
+		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		sm.setFadeDegree(0.35f);
+		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+
+//		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
 }
