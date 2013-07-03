@@ -3,23 +3,33 @@
 
     <item
         android:id="@+id/profile"
+        android:icon="@drawable/person"
         android:title="User Profile">
     </item>
     <item
         android:id="@+id/report"
+        android:icon="@drawable/report"
         android:title="Report">
     </item>
     <item
         android:id="@+id/question"
+        android:icon="@drawable/question"
         android:title="Question">
     </item>
     <item
         android:id="@+id/task"
+        android:icon="@drawable/task"
         android:title="Task">
     </item>
     <item
         android:id="@+id/setting"
+        android:icon="@drawable/settings"
         android:title="Settings">
+    </item>
+    <item
+        android:id="@+id/license"
+        android:title="Licenses"
+        android:icon="@drawable/license">
     </item>
 
 </menu>
