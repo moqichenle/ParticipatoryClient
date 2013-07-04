@@ -1,5 +1,8 @@
 package ie.tcd.scss.dsg.particpatory;
 
+import ie.tcd.scss.dsg.particpatory.report.ReportActivity;
+import ie.tcd.scss.dsg.particpatory.user.UserProfile;
+
 import java.lang.reflect.Constructor;
 
 import android.content.Context;

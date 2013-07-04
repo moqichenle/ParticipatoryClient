@@ -1,5 +1,12 @@
-package ie.tcd.scss.dsg.particpatory;
+package ie.tcd.scss.dsg.particpatory.user;
 
+import ie.tcd.scss.dsg.particpatory.AppContext;
+import ie.tcd.scss.dsg.particpatory.R;
+import ie.tcd.scss.dsg.particpatory.SampleListFragment;
+import ie.tcd.scss.dsg.particpatory.R.dimen;
+import ie.tcd.scss.dsg.particpatory.R.drawable;
+import ie.tcd.scss.dsg.particpatory.R.id;
+import ie.tcd.scss.dsg.particpatory.R.layout;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;

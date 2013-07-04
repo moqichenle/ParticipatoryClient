@@ -1,5 +1,8 @@
 package ie.tcd.scss.dsg.particpatory;
 
+import ie.tcd.scss.dsg.particpatory.user.UserProfile;
+import ie.tcd.scss.dsg.particpatory.user.UserRegister;
+import ie.tcd.scss.dsg.particpatory.user.Welcome;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;

@@ -1,5 +1,7 @@
-package ie.tcd.scss.dsg.particpatory;
+package ie.tcd.scss.dsg.particpatory.user;
 
+import ie.tcd.scss.dsg.particpatory.AppContext;
+import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.po.User;
 import ie.tcd.scss.dsg.po.UserLocation;
 
@@ -13,9 +15,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-
-import com.google.android.gcm.GCMRegistrar;
-import com.google.gson.Gson;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -37,6 +36,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.android.gcm.GCMRegistrar;
+import com.google.gson.Gson;
 
 @TargetApi(Build.VERSION_CODES.GINGERBREAD)
 public class UserRegister extends Activity {

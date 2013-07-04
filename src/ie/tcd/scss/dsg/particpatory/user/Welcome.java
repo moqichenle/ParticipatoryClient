@@ -1,5 +1,9 @@
-package ie.tcd.scss.dsg.particpatory;
+package ie.tcd.scss.dsg.particpatory.user;
 
+import ie.tcd.scss.dsg.particpatory.GCMIntentService;
+import ie.tcd.scss.dsg.particpatory.R;
+import ie.tcd.scss.dsg.particpatory.R.id;
+import ie.tcd.scss.dsg.particpatory.R.layout;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;

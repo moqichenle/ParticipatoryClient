@@ -58,11 +58,12 @@
         <activity
             android:name=".RegisterActivity"
             android:launchMode="singleTop" />
-        <activity android:name="UserRegister" >
+        <activity android:name=".user.UserRegister" >
         </activity>
-        <activity android:name="Welcome"></activity>
-        <activity android:name="UserProfile"></activity>
-        <activity android:name="ReportActivity"></activity>
+        <activity android:name=".user.Welcome"></activity>
+        <activity android:name=".user.UserProfile"></activity>
+        <activity android:name=".report.AddReportActivity"></activity>
+        <activity android:name=".report.ReportActivity"></activity>
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import com.google.api.client.json.jackson.JacksonFactory;
 
 import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.Deviceinfoendpoint;
 import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.model.DeviceInfo;
+import ie.tcd.scss.dsg.particpatory.user.UserRegister;
 
 /**
  * This class is started up as a service of the Android application. It listens

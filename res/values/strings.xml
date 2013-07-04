@@ -5,4 +5,28 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
 
+    <string-array name="category_array">
+        <item>Select Category</item>
+        <item>Traffic</item>
+        <item>Impression</item>
+        <item>Queue</item>
+    </string-array>
+    <string-array name="keyword_array">
+        <item>Select Keyword</item>
+        <item>Traffic jam</item>
+        <item>Emergency</item>
+        <item>Good</item>
+        <item>Bad</item>
+    </string-array>
+     <string-array name="tra_keyword_array">
+        <item>Select Keyword</item>
+        <item>Traffic jam</item>
+        <item>Emergency</item>
+    </string-array>
+    <string-array name="imp_keyword_array">
+        <item>Select Keyword</item>
+        <item>Good</item>
+        <item>Bad</item>
+    </string-array>
+
 </resources>
