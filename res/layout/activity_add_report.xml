@@ -30,7 +30,7 @@
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@+id/textView1"
         android:src="@drawable/location_found"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <ImageView
         android:id="@+id/imageView3"

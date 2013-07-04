@@ -3,16 +3,43 @@ package ie.tcd.scss.dsg.particpatory.report;
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
+import ie.tcd.scss.dsg.particpatory.util.Constant;
+import ie.tcd.scss.dsg.po.Report;
+import ie.tcd.scss.dsg.po.User;
+import ie.tcd.scss.dsg.po.UserLocation;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -21,28 +48,27 @@ public class AddReportActivity extends SlidingFragmentActivity {
 	private AppContext context;
 	private ListFragment mFrag;
 	private Spinner keywords;
-	@SuppressWarnings("unused")
 	private byte categoryId = 0;
 	private ArrayAdapter<CharSequence> keywordsAdapter;
+	private Location local;
+	private LocationManager locationManager;
+	private ImageView finding;
+	private Timer timer;
+	private String contend;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
 		setContentView(R.layout.activity_add_report);
 		setupSlidingMenu(savedInstanceState);
 		Log.d(TAG, "loaded");
 		Spinner category = (Spinner) findViewById(R.id.category);
-		// Create an ArrayAdapter using the string array and a default spinner
-		// layout
 		ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter
 				.createFromResource(this, R.array.category_array,
 						android.R.layout.simple_spinner_item);
-		// Specify the layout to use when the list of choices appears
 		categoryAdapter
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// Apply the adapter to the spinner
 		category.setAdapter(categoryAdapter);
 
 		keywords = (Spinner) findViewById(R.id.hintword);
@@ -52,8 +78,133 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		keywords.setAdapter(keywordsAdapter);
 
+		keywords.setOnItemSelectedListener(this.selectKeyword);
 		category.setOnItemSelectedListener(this.selectCategory);
+
+		finding = (ImageView) findViewById(R.id.locationIcon);
+
+		// positioning
+		locationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
+		// GPS_PROVIDER
+		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			buildAlertMessageNoGps();
+		}
+		local = locationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				500, 5, locationListener);
+		startTimer();
+
+		Button submit = (Button) findViewById(R.id.submit);
+		submit.setOnClickListener(this.submitListener);
 	}
+
+	private void startTimer() {
+		this.timer = new Timer();
+		Log.d(TAG, "timer starts.");
+		this.timer.schedule(new TimeTask(), 0, 10000);
+	}
+
+	class TimeTask extends TimerTask {
+		@Override
+		public void run() {
+			local = locationManager
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
+		}
+	}
+
+	private OnClickListener submitListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Log.d(TAG, "submit report");
+			if (local != null && local.hasAccuracy()
+					&& local.getAccuracy() <= 50) {
+				finding.setImageResource(R.drawable.accept);
+				Log.d(TAG, "" + local.getAccuracy() + "*" + local.getLatitude());
+			} else {
+				buildAlertMessageNoLocation();
+			}
+
+			User currentUser = new User();
+			UserLocation currLocation = new UserLocation();
+			currLocation.setAccuracy(local.getAccuracy());
+			currLocation.setBearing(local.getBearing());
+			currLocation.setLatitude(local.getLatitude());
+			currLocation.setLongitude(local.getLongitude());
+			currLocation.setSpeed(local.getSpeed());
+			currentUser.setLocation(currLocation);
+
+			Report report = new Report();
+			report.setCategoryId(categoryId);
+			report.setContend(contend);
+			report.setUserId(Long.valueOf(context.getUserId()));
+
+			// TODO value below need to be changed
+			currentUser.setAverCycleSpeed(0);
+			currentUser.setAverDriveSpeed(0);
+			currentUser.setAverWalkSpeed(0);
+			currentUser.setMode("Walking");
+			currentUser.setStreetName("O'connell");
+			currentUser.setUserId(Long.valueOf(context.getUserId()));
+			report.setUser(currentUser);
+
+			if (android.os.Build.VERSION.SDK_INT > 9) {
+				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+						.permitAll().build();
+				StrictMode.setThreadPolicy(policy);
+			}
+			Log.d(TAG, "set url");
+			String url = Constant.url + "/newreport";
+			HttpPost request = new HttpPost(url);
+			Gson gson = new Gson();
+			String json = gson.toJson(report);
+			StringEntity entity;
+			try {
+				entity = new StringEntity(json, "UTF-8");
+				entity.setContentType("application/json");
+				request.setEntity(entity);
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpResponse response = httpClient.execute(request);
+				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+					Log.d(TAG, "request successfully");
+					Intent newIntent = new Intent(getApplicationContext(),
+							ReportActivity.class);
+					startActivity(newIntent);
+				} else {
+					Log.d(TAG, "failed");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	};
+
+	private LocationListener locationListener = new LocationListener() {
+		public void onLocationChanged(Location location) {
+			Log.d(TAG, "get new location updated");
+			local = location;
+			if (local != null && local.hasAccuracy()
+					&& local.getAccuracy() <= 50) {
+				finding.setImageResource(R.drawable.accept);
+				Log.d(TAG, "get location good enough");
+			}
+		}
+
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
+
+		public void onProviderEnabled(String provider) {
+		}
+
+		public void onProviderDisabled(String provider) {
+		}
+	};
 
 	private OnItemSelectedListener selectCategory = new OnItemSelectedListener() {
 
@@ -80,8 +231,20 @@ public class AddReportActivity extends SlidingFragmentActivity {
 
 		@Override
 		public void onNothingSelected(AdapterView<?> arg0) {
-			// TODO Auto-generated method stub
+		}
 
+	};
+	private OnItemSelectedListener selectKeyword = new OnItemSelectedListener() {
+
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View v, int pos,
+				long id) {
+			String keyword = (String) parent.getItemAtPosition(pos);
+			contend = keyword;
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> arg0) {
 		}
 
 	};
@@ -109,5 +272,57 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 
 		// getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		locationManager.removeUpdates(locationListener);
+		timer.cancel();
+		timer.purge();
+	}
+
+	/**
+	 * didnt get good enough location
+	 */
+	private void buildAlertMessageNoLocation() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(
+				"Your location is not good enough, please wait for several seconds.")
+				.setCancelable(false)
+				.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog,
+							final int id) {
+						dialog.cancel();
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	/**
+	 * to check if the GPS is open
+	 */
+	private void buildAlertMessageNoGps() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(
+				"Your GPS seems to be disabled, do you want to enable it?")
+				.setCancelable(false)
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+							public void onClick(final DialogInterface dialog,
+									final int id) {
+								startActivity(new Intent(
+										android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+							}
+						})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog,
+							final int id) {
+						dialog.cancel();
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
 	}
 }

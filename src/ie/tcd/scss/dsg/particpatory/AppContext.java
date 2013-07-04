@@ -14,6 +14,8 @@ public class AppContext extends Application {
 	private float averWalkSpeed;
 	private float averDriveSpeed;
 	private float averCycleSpeed;
+	private int taskingAmount;
+	private int acceptedTaskAmount;
 	
 	@Override
 	public void onCreate() {
@@ -35,6 +37,10 @@ public class AppContext extends Application {
 		setAverDriveSpeed(drive);
 		float accept =  sharedPreferences.getFloat("accept", 0);
 		setAcceptPercent(accept);
+		int overall = sharedPreferences.getInt("overall", 0);
+		setTaskingAmount(overall);
+		int acceptAmount = sharedPreferences.getInt("acceptAmount", 0);
+		setAcceptedTaskAmount(acceptAmount);
 	}
 	public String getUserId() {
 		return userId;
@@ -84,7 +90,17 @@ public class AppContext extends Application {
 	public void setAverCycleSpeed(float averCycleSpeed) {
 		this.averCycleSpeed = averCycleSpeed;
 	}
-
-	
+	public int getTaskingAmount() {
+		return taskingAmount;
+	}
+	public void setTaskingAmount(int taskingAmount) {
+		this.taskingAmount = taskingAmount;
+	}
+	public int getAcceptedTaskAmount() {
+		return acceptedTaskAmount;
+	}
+	public void setAcceptedTaskAmount(int acceptedTaskAmount) {
+		this.acceptedTaskAmount = acceptedTaskAmount;
+	}
 
 }

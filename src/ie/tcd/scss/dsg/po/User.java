@@ -22,9 +22,9 @@ public class User {
 	private long updatedTime;
 
 	private UserLocation location;
-
-	private String streetName;
 	private byte hasSensor;
+	private String streetName;
+	
 	private String mode;
 	private float acceptPercent;
 	private float averWalkSpeed;

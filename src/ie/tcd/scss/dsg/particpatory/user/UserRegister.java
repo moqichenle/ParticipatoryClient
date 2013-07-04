@@ -2,6 +2,7 @@ package ie.tcd.scss.dsg.particpatory.user;
 
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
+import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.User;
 import ie.tcd.scss.dsg.po.UserLocation;
 
@@ -133,7 +134,7 @@ public class UserRegister extends Activity {
 				Log.d(TAG, "get location good enough");
 				Log.d(TAG, local.getAccuracy() + "");
 
-				String url = "http://10.6.33.177:8888/newuser";
+				String url = Constant.url+"/newuser";
 				if (android.os.Build.VERSION.SDK_INT > 9) {
 					StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 							.permitAll().build();
@@ -239,6 +240,15 @@ public class UserRegister extends Activity {
 		final AlertDialog alert = builder.create();
 		alert.show();
 	}
+	
+	@Override
+	protected void onPause() {
+		locationManager.removeUpdates(locationListener);
+		super.onPause();
+	}
+	
+	
+	
 }
 
 // private class NetworkTask extends AsyncTask<String, Void, HttpResponse>
