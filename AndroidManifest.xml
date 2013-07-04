@@ -61,9 +61,9 @@
         <activity android:name=".user.UserRegister" >
         </activity>
         <activity android:name=".user.Welcome"></activity>
-        <activity android:name=".user.UserProfile"></activity>
-        <activity android:name=".report.AddReportActivity"></activity>
-        <activity android:name=".report.ReportActivity"></activity>
+        <activity android:name=".user.UserProfile" android:theme="@android:style/Theme.Holo"></activity>
+        <activity android:name=".report.AddReportActivity" android:theme="@android:style/Theme.Holo"></activity>
+        <activity android:name=".report.ReportActivity" android:theme="@android:style/Theme.Holo"></activity>
     </application>
 
 </manifest>

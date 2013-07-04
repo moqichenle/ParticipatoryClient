@@ -10,6 +10,8 @@ import android.app.Activity;
 import android.util.Log;
 import android.widget.Toast;
 
+import ie.tcd.scss.dsg.particpatory.util.Constant;
+
 import java.io.IOException;
 
 /**
@@ -47,7 +49,7 @@ public class CloudEndpointUtils {
    * http://developer.android.com/tools/devices/emulator.html#networkaddresses
    * for more information.
    */
-  protected static final String LOCAL_APP_ENGINE_SERVER_URL_FOR_ANDROID = "http://10.6.33.177:8888";//10.0.2.2; 192.168.1.10
+  protected static final String LOCAL_APP_ENGINE_SERVER_URL_FOR_ANDROID = Constant.url;//10.0.2.2; 192.168.1.10
 
   /**
    * Updates the Google client builder to connect the appropriate server based

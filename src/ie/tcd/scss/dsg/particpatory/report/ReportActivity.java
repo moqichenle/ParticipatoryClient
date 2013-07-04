@@ -8,12 +8,12 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
+
 
 public class ReportActivity extends SlidingFragmentActivity {
 	private static final String TAG = "ReportActivity";
@@ -28,23 +28,30 @@ public class ReportActivity extends SlidingFragmentActivity {
 		setContentView(R.layout.activity_report);
 		setupSlidingMenu(savedInstanceState);
 		Log.d(TAG, "loaded");
-		ImageView newReport = (ImageView) findViewById(R.id.newReport);
-		newReport.setOnClickListener(this.newReportListener);
 	}
 
 	
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.actionbar_menu, menu);
+		return true;
+	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				break;
+			case R.id.menu_add:
+				Intent newEntryIntent = new Intent(this, AddReportActivity.class);
+				startActivity(newEntryIntent);
+				break;
+			}
+		
+		return true;
+	}
 
-	private OnClickListener newReportListener = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			Intent add = new Intent(context, AddReportActivity.class);
-			startActivity(add);
-		}
-
-	};
 
 	private void setupSlidingMenu(Bundle savedInstanceState) {
 
