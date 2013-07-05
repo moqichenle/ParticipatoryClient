@@ -7,7 +7,7 @@ package ie.tcd.scss.dsg.po;
  * 
  *         store user reports
  */
-public class Report {
+public class ReportFromApp {
 
 	private Long reportId;
 
@@ -15,10 +15,10 @@ public class Report {
 	private byte categoryId;
 	private String contend;
 	private long reportTime;
-	private double latitude;
-	private double longitude;
-	private byte[] attachment;
 
+	private byte[] attachment;
+	private User user;
+	
 	
 
 	public Long getReportId() {
@@ -61,21 +61,6 @@ public class Report {
 		this.reportTime = reportTime;
 	}
 
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
 
 	public byte[] getAttachment() {
 		return attachment;
@@ -84,5 +69,14 @@ public class Report {
 	public void setAttachment(byte[] attachment) {
 		this.attachment = attachment;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 
 }

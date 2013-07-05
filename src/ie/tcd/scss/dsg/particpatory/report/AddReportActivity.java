@@ -4,7 +4,7 @@ import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
-import ie.tcd.scss.dsg.po.Report;
+import ie.tcd.scss.dsg.po.ReportFromApp;
 import ie.tcd.scss.dsg.po.User;
 import ie.tcd.scss.dsg.po.UserLocation;
 
@@ -138,7 +138,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 			currLocation.setSpeed(local.getSpeed());
 			currentUser.setLocation(currLocation);
 
-			Report report = new Report();
+			ReportFromApp report = new ReportFromApp();
 			report.setCategoryId(categoryId);
 			report.setContend(contend);
 			report.setUserId(Long.valueOf(context.getUserId()));

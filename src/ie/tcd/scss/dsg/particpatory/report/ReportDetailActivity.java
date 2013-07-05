@@ -4,12 +4,13 @@ import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
-import ie.tcd.scss.dsg.po.ReportFromApp;
+import ie.tcd.scss.dsg.po.Report;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -21,83 +22,47 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class ReportActivity extends SlidingFragmentActivity {
-	private static final String TAG = "ReportActivity";
+public class ReportDetailActivity extends SlidingFragmentActivity {
+	private static final String TAG = "DetailedReport";
 	private AppContext context;
 	private ListFragment mFrag;
-	private ListView listView;
 	private String results;
-
+	private TextView report_category;
+	private TextView report_content;
+	private TextView report_location;
+	private TextView report_time;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
-		setContentView(R.layout.activity_report);
+		setContentView(R.layout.activity_report_detail);
 		setupSlidingMenu(savedInstanceState);
 		Log.d(TAG, "loaded");
-		listView = (ListView) findViewById(R.id.reportlist);
-		listView.setOnItemClickListener(this.listViewListener);
+		String reportId = context.getReportId();
+		report_category = (TextView) findViewById(R.id.r_1);
+		report_content= (TextView) findViewById(R.id.r_2);
+		report_location = (TextView) findViewById(R.id.r_3);
+		report_time = (TextView) findViewById(R.id.r_4);
+		
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
-		new ReportListTask().execute(Constant.url + "/reportlistofuser");
-	}
-
-	private OnItemClickListener listViewListener = new OnItemClickListener() {
-
-		@Override
-		public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-			String itemValue = (String) listView.getItemAtPosition(pos);
-			String[] split = itemValue.split("_");
-			String reportId = split[0];
-			context.setReportId(reportId);
-//			Toast.makeText(getApplicationContext(),
-//					"Position :" + pos + "  reportId : " + reportId,
-//					Toast.LENGTH_LONG).show();
-			Intent certainReport = new Intent(context, ReportDetailActivity.class);
-			startActivity(certainReport);
-		}
-
-	};
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.actionbar_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			break;
-		case R.id.menu_add:
-			Intent newEntryIntent = new Intent(this, AddReportActivity.class);
-			startActivity(newEntryIntent);
-			break;
-		}
-		return true;
+		new ReportDetailTask().execute(Constant.url+"/reportdetail", reportId); 
 	}
 
 	private void setupSlidingMenu(Bundle savedInstanceState) {
@@ -125,8 +90,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 		// getActionBar().setDisplayHomeAsUpEnabled(true); // the logo of the
 		// app can be clicked
 	}
-
-	private class ReportListTask extends AsyncTask<String, Void, HttpResponse> {
+	private class ReportDetailTask extends AsyncTask<String, Void, HttpResponse> {
 		@Override
 		protected HttpResponse doInBackground(String... urls) {
 			String url = urls[0];
@@ -134,8 +98,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 			HttpPost request = new HttpPost(url);
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpResponse response = null;
-			String userId = context.getUserId();
-			postParameters.add(new BasicNameValuePair("userId", userId));
+			postParameters.add(new BasicNameValuePair("reportId", urls[1]));
 
 			Log.d(TAG, "before requesting");
 			try {
@@ -154,27 +117,21 @@ public class ReportActivity extends SlidingFragmentActivity {
 
 		@Override
 		protected void onPostExecute(HttpResponse response) {
-			// Do something with result
 			if (response != null) {
 				try {
-
 					BufferedReader reader = new BufferedReader(
 							new InputStreamReader(response.getEntity()
 									.getContent(), "UTF-8"));
 					results = reader.readLine();
 					Gson gson = new Gson();
-					ReportFromApp[] reports = gson.fromJson(results, ReportFromApp[].class);
-					String[] values = new String[reports.length];
-					for (int i = 0; i < reports.length; i++) {
-						Log.d(TAG, "get report +" + reports[i].getReportId());
-						values[i] = reports[i].getReportId() + "_"
-								+ reports[i].getContend();
-					}
-
-					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-							context, android.R.layout.simple_list_item_1,
-							android.R.id.text1, values);
-					listView.setAdapter(adapter);
+					Report report = new Report();
+					report = gson.fromJson(results, Report.class);
+					Log.d(TAG, results);
+					report_category.setText(Constant.getCategoryName(report.getCategoryId()));
+					report_content.setText(report.getContend());
+					report_location.setText(report.getLatitude()+";"+report.getLongitude());
+					Date myDate = new Date(report.getReportTime());
+					report_time.setText(myDate.toString());
 				} catch (ParseException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -183,5 +140,4 @@ public class ReportActivity extends SlidingFragmentActivity {
 			}
 		}
 	}
-	
 }

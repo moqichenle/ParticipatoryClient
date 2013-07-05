@@ -13,4 +13,8 @@ public class Calculation {
 	public static float acceptance(int accepted, int overall){
 		return accepted/overall*1.0f;
 	}
+	
+	public static String getStreetName(double latitude, double longtitude){
+		return "";
+	}
 }
