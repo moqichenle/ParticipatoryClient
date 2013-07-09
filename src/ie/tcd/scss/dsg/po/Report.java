@@ -1,6 +1,7 @@
 package ie.tcd.scss.dsg.po;
 
 
+
 /**
  * 
  * @author Lele
@@ -18,7 +19,7 @@ public class Report {
 	private double latitude;
 	private double longitude;
 	private byte[] attachment;
-
+	private String streetName;
 	
 
 	public Long getReportId() {
@@ -77,12 +78,21 @@ public class Report {
 		this.longitude = longitude;
 	}
 
+
 	public byte[] getAttachment() {
 		return attachment;
 	}
 
 	public void setAttachment(byte[] attachment) {
 		this.attachment = attachment;
+	}
+
+	public String getStreetName() {
+		return streetName;
+	}
+
+	public void setStreetName(String streetName) {
+		this.streetName = streetName;
 	}
 
 }

@@ -4,6 +4,7 @@
     <string name="app_name">Particpatory</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
+    <string name="log_filename">Log File</string>
 
     <string-array name="category_array">
         <item>Select Category</item>

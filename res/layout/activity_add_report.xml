@@ -49,25 +49,6 @@
         android:layout_alignLeft="@+id/textView1"
         android:layout_alignTop="@+id/imageView3" />
 
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imageView4"
-        android:layout_toLeftOf="@+id/locationIcon"
-        android:text="Add attachment"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/TextView01"
-        android:layout_marginBottom="95dp"
-        android:layout_marginRight="11dp"
-        android:text="Submit" />
-
     <Spinner
         android:id="@+id/hintword"
         android:layout_width="wrap_content"
@@ -77,28 +58,47 @@
         android:layout_toRightOf="@+id/ImageView01" />
 
     <ImageView
-        android:id="@+id/addAttachment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/TextView01"
-        android:layout_alignLeft="@+id/locationIcon"
-        android:src="@android:drawable/ic_menu_add" />
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/imageView3"
-        android:layout_below="@+id/hintword"
-        android:layout_marginTop="27dp"
-        android:src="@drawable/attachment" />
-
-    <ImageView
         android:id="@+id/ImageView01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/hintword"
         android:layout_toLeftOf="@+id/category"
         android:src="@drawable/list" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imageView4"
+        android:layout_toRightOf="@+id/imageView4"
+        android:text="Add an image"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hintword"
+        android:layout_marginTop="21dp"
+        android:layout_toLeftOf="@+id/hintword"
+        android:src="@drawable/attachment" />
+
+    <ImageView
+        android:id="@+id/addAttachment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/TextView01"
+        android:layout_marginLeft="12dp"
+        android:layout_toRightOf="@+id/TextView01"
+        android:src="@android:drawable/ic_menu_add" />
+
+    <ImageView
+        android:id="@+id/showpics"
+        android:layout_width="200sp"
+        android:layout_height="180sp"
+        android:layout_below="@+id/addAttachment"
+        android:layout_toRightOf="@+id/imageView4"
+        android:src="@drawable/attachment"
+        android:visibility="invisible" />
 
 </RelativeLayout>

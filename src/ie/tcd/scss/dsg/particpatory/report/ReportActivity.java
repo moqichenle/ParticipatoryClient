@@ -83,7 +83,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.actionbar_menu, menu);
+		getMenuInflater().inflate(R.menu.actionbar_list_page, menu);
 		return true;
 	}
 

@@ -9,6 +9,7 @@ import ie.tcd.scss.dsg.po.Report;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -43,7 +44,7 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 	private TextView report_content;
 	private TextView report_location;
 	private TextView report_time;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,16 +54,17 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 		Log.d(TAG, "loaded");
 		String reportId = context.getReportId();
 		report_category = (TextView) findViewById(R.id.r_1);
-		report_content= (TextView) findViewById(R.id.r_2);
+		report_content = (TextView) findViewById(R.id.r_2);
 		report_location = (TextView) findViewById(R.id.r_3);
 		report_time = (TextView) findViewById(R.id.r_4);
-		
+
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
-		new ReportDetailTask().execute(Constant.url+"/reportdetail", reportId); 
+		new ReportDetailTask()
+				.execute(Constant.url + "/reportdetail", reportId);
 	}
 
 	private void setupSlidingMenu(Bundle savedInstanceState) {
@@ -90,7 +92,9 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 		// getActionBar().setDisplayHomeAsUpEnabled(true); // the logo of the
 		// app can be clicked
 	}
-	private class ReportDetailTask extends AsyncTask<String, Void, HttpResponse> {
+
+	private class ReportDetailTask extends
+			AsyncTask<String, Void, HttpResponse> {
 		@Override
 		protected HttpResponse doInBackground(String... urls) {
 			String url = urls[0];
@@ -127,11 +131,14 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 					Report report = new Report();
 					report = gson.fromJson(results, Report.class);
 					Log.d(TAG, results);
-					report_category.setText(Constant.getCategoryName(report.getCategoryId()));
+					report_category.setText(Constant.getCategoryName(report
+							.getCategoryId()));
 					report_content.setText(report.getContend());
-					report_location.setText(report.getLatitude()+";"+report.getLongitude());
+					report_location.setText(report.getStreetName());
 					Date myDate = new Date(report.getReportTime());
-					report_time.setText(myDate.toString());
+					String reportDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(myDate);
+					report_time.setText(reportDate);
+
 				} catch (ParseException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

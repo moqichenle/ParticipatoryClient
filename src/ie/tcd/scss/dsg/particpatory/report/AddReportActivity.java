@@ -8,6 +8,7 @@ import ie.tcd.scss.dsg.po.ReportFromApp;
 import ie.tcd.scss.dsg.po.User;
 import ie.tcd.scss.dsg.po.UserLocation;
 
+import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,27 +18,34 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -55,7 +63,11 @@ public class AddReportActivity extends SlidingFragmentActivity {
 	private ImageView finding;
 	private Timer timer;
 	private String contend;
-
+	private ImageView attach;
+	private ImageView imageView;
+	private String formatted_address;
+	private User currentUser = new User();
+	private ReportFromApp report = new ReportFromApp();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -86,40 +98,75 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		// positioning
 		locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
+		Log.d(TAG, "try to get last known location from GPS");
+		local = locationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		if(local==null){
+			Log.d(TAG, "NO last known location from GPS,try to get from network");
+			local = locationManager
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		}
 		// GPS_PROVIDER
 		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			buildAlertMessageNoGps();
 		}
-		local = locationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				500, 5, locationListener);
 		startTimer();
 
-		Button submit = (Button) findViewById(R.id.submit);
-		submit.setOnClickListener(this.submitListener);
+		attach = (ImageView) findViewById(R.id.addAttachment);
+		attach.setOnClickListener(this.addAttachment);
+		imageView = (ImageView) findViewById(R.id.showpics);
 	}
 
-	private void startTimer() {
-		this.timer = new Timer();
-		Log.d(TAG, "timer starts.");
-		this.timer.schedule(new TimeTask(), 0, 10000);
-	}
-
-	class TimeTask extends TimerTask {
-		@Override
-		public void run() {
-			local = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
-		}
-	}
-
-	private OnClickListener submitListener = new OnClickListener() {
+	private OnClickListener addAttachment = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
+			Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			startActivityForResult(takePicture, 0);// zero can be replced with
+													// any action code
+		}
+
+	};
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent imageReturnedIntent) {
+		super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+		if(requestCode==0){
+			if(imageReturnedIntent!=null){
+				Bitmap photo = (Bitmap) imageReturnedIntent.getExtras().get("data");
+				photo = Bitmap.createBitmap(photo);
+	            imageView.setImageBitmap(photo);
+	            imageView.setVisibility(View.VISIBLE);
+	            int bytes = photo.getByteCount();
+	          //or we can calculate bytes this way. Use a different value than 4 if you don't use 32bit images.
+	          //int bytes = b.getWidth()*b.getHeight()*4; 
+
+	          ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
+	          photo.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
+	          byte[] array = buffer.array(); 
+	          Log.d(TAG, "@@@@@@@@@@@@@@@@@picture's size=="+array.length);
+	          report.setAttachment(array);
+			}
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.actionbar_add_page, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			break;
+		case R.id.menu_submit:
 			Log.d(TAG, "submit report");
 			if (local != null && local.hasAccuracy()
 					&& local.getAccuracy() <= 50) {
@@ -129,7 +176,6 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				buildAlertMessageNoLocation();
 			}
 
-			User currentUser = new User();
 			UserLocation currLocation = new UserLocation();
 			currLocation.setAccuracy(local.getAccuracy());
 			currLocation.setBearing(local.getBearing());
@@ -138,7 +184,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 			currLocation.setSpeed(local.getSpeed());
 			currentUser.setLocation(currLocation);
 
-			ReportFromApp report = new ReportFromApp();
+			
 			report.setCategoryId(categoryId);
 			report.setContend(contend);
 			report.setUserId(Long.valueOf(context.getUserId()));
@@ -148,7 +194,9 @@ public class AddReportActivity extends SlidingFragmentActivity {
 			currentUser.setAverDriveSpeed(0);
 			currentUser.setAverWalkSpeed(0);
 			currentUser.setMode("Walking");
-			currentUser.setStreetName("O'connell");
+
+			// TODO streetsname using formatted_address
+			currentUser.setStreetName(formatted_address);
 			currentUser.setUserId(Long.valueOf(context.getUserId()));
 			report.setUser(currentUser);
 
@@ -180,19 +228,47 @@ public class AddReportActivity extends SlidingFragmentActivity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
+			break;
 		}
+		return true;
+	}
 
-	};
+	private void startTimer() {
+		this.timer = new Timer();
+		Log.d(TAG, "timer starts.");
+		this.timer.schedule(new TimeTask(), 10000, 10000);
+	}
+
+	class TimeTask extends TimerTask {
+		@Override
+		public void run() {
+			Log.d(TAG, "load network provider");
+			local = locationManager
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
+			timer.cancel();
+			timer.purge();
+		}
+	}
 
 	private LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "get new location updated");
 			local = location;
-			if (local != null && local.hasAccuracy()
-					&& local.getAccuracy() <= 50) {
+			if (local != null && local.hasAccuracy()&& local.getAccuracy() <= 50) {
 				finding.setImageResource(R.drawable.accept);
 				Log.d(TAG, "get location good enough");
+				TextView textView = (TextView) findViewById(R.id.textView1);
+				JSONObject ret = Constant.getLocationInfo(local.getLatitude(),local.getLongitude());
+				JSONObject address;
+				try {
+					address = ret.getJSONArray("results").getJSONObject(0);
+					formatted_address = address.getString("formatted_address");
+					textView.setText(formatted_address);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -278,8 +354,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 	protected void onPause() {
 		super.onPause();
 		locationManager.removeUpdates(locationListener);
-		timer.cancel();
-		timer.purge();
+
 	}
 
 	/**
