@@ -40,7 +40,7 @@
         android:layout_below="@+id/imageView1"
         android:layout_marginTop="27dp"
         android:text="Would like to know the "
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Spinner
         android:id="@+id/query_spinner"
@@ -57,9 +57,9 @@
         android:layout_alignLeft="@+id/query_spinner"
         android:layout_centerVertical="true"
         android:text="at:"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/query_location_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

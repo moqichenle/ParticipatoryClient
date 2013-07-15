@@ -19,7 +19,7 @@
         <item>Good</item>
         <item>Bad</item>
     </string-array>
-     <string-array name="tra_keyword_array">
+    <string-array name="tra_keyword_array">
         <item>Select Keyword</item>
         <item>Traffic jam</item>
         <item>Emergency</item>

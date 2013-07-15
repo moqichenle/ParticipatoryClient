@@ -8,15 +8,19 @@ import ie.tcd.scss.dsg.po.Query;
 import ie.tcd.scss.dsg.po.User;
 import ie.tcd.scss.dsg.po.UserLocation;
 
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +35,8 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +44,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -57,13 +64,16 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 	private String formatted_address;
 	private byte categoryId = 0;
 	private ImageView finding;
-	private TextView location_of_interest;
+	private AutoCompleteTextView location_of_interest;
+	private double lat;
+	private double lon;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
 		setContentView(R.layout.activity_add_query);
+
 		setupSlidingMenu(savedInstanceState);
 		Spinner category = (Spinner) findViewById(R.id.query_spinner);
 		ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter
@@ -98,9 +108,95 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 		startTimer();
 
 		finding = (ImageView) findViewById(R.id.query_locationing);
-		location_of_interest = (TextView) findViewById(R.id.query_location_input);
+		location_of_interest = (AutoCompleteTextView) findViewById(R.id.query_location_input);
+
+		location_of_interest.addTextChangedListener(this.searchLocation);
+		location_of_interest.setThreshold(3);
+		// location_of_interest.setOnClickListener(new OnClickListener(){
+		// @Override
+		// public void onClick(View arg0) {
+		// location_of_interest.setDropDownHeight(LayoutParams.WRAP_CONTENT);
+		// }
+		// });
+		// location_of_interest.setOnItemClickListener(new
+		// OnItemClickListener(){
+		// @Override
+		// public void onItemClick(AdapterView<?> listView, View arg1, int
+		// position, long arg3) {
+		// try
+		// {
+		// String venue = (String)listView.getItemAtPosition(position);
+		// location_of_interest.setText(venue);
+		// location_of_interest.dismissDropDown();
+		// location_of_interest.setDropDownHeight(0);
+		// }
+		// catch(Exception e)
+		// {
+		// Log.v("erros", e.toString());
+		// }
+		// }
+		// });
 	}
 
+	private TextWatcher searchLocation = new TextWatcher() {
+
+		@Override
+		public void afterTextChanged(Editable input) {
+			if (android.os.Build.VERSION.SDK_INT > 9) {
+				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+						.permitAll().build();
+				StrictMode.setThreadPolicy(policy);
+			}
+			String street = input.toString().replaceAll(" ", "");
+			Log.d(TAG, "###" + input);
+			Log.d(TAG, "**" + street);
+			HttpGet httpGet = new HttpGet(
+					"http://maps.googleapis.com/maps/api/geocode/json?address="
+							+ street + "&sensor=false");
+			HttpClient client = new DefaultHttpClient();
+			HttpResponse response;
+			StringBuilder stringBuilder = new StringBuilder();
+			try {
+				response = client.execute(httpGet);
+				HttpEntity entity = response.getEntity();
+				InputStream stream = entity.getContent();
+				int b;
+				while ((b = stream.read()) != -1) {
+					stringBuilder.append((char) b);
+				}
+
+				JSONObject object = new JSONObject(stringBuilder.toString());
+				JSONArray array = object.getJSONArray("results");
+				String[] addresses = new String[array.length()];
+				for (int i = 0; i < array.length(); i++) {
+					addresses[i] = array.getJSONObject(i).getString(
+							"formatted_address");
+					Log.d(TAG, addresses[i]);
+					if (i == 2)
+						break;
+				}
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+						context, android.R.layout.simple_list_item_1, addresses);
+				location_of_interest.setAdapter(adapter);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+				int arg3) {
+
+		}
+
+		@Override
+		public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+				int arg3) {
+
+		}
+
+	};
 	private LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "get new location updated");
@@ -167,7 +263,7 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 			break;
 		case R.id.menu_submit:
 			if (local != null && local.hasAccuracy()
-			&& local.getAccuracy() <= 50) {
+					&& local.getAccuracy() <= 50) {
 				Query newQuery = new Query();
 				if (categoryId == -1) {
 					Toast.makeText(context, "please select a category",
@@ -183,24 +279,24 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 							+ Constant.getCategoryName(categoryId) + "at "
 							+ location_of_interest;
 					newQuery.setContent(content);
-					newQuery.setLatitude(local.getLatitude());
-					newQuery.setLongitude(local.getLongitude());
+					getLocationFromStreetName(location_of_interest.getText().toString());
+					newQuery.setLatitude(lat);
+					newQuery.setLongitude(lon);
 					newQuery.setQueryTime(System.currentTimeMillis());
 					newQuery.setStreetName(formatted_address);
 					newQuery.setUserId(Long.valueOf(context.getUserId()));
 					boolean flag = submitQuery(newQuery);
 					User currentUser = new User();
-					
-					
+
 					UserLocation currLocation = new UserLocation();
 					currLocation.setAccuracy(local.getAccuracy());
 					currLocation.setBearing(local.getBearing());
 					currLocation.setLatitude(local.getLatitude());
 					currLocation.setLongitude(local.getLongitude());
 					currLocation.setSpeed(local.getSpeed());
-					
+
 					currentUser.setLocation(currLocation);
-					//TODO average speed and mode.
+					// TODO average speed and mode.
 					currentUser.setAcceptPercent(context.getAcceptPercent());
 					currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
 					currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
@@ -209,12 +305,12 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					currentUser.setStreetName(formatted_address);
 					currentUser.setUpdatedTime(System.currentTimeMillis());
 					currentUser.setUserId(Long.valueOf(context.getUserId()));
-					
-					if(flag){
+
+					if (flag) {
 						updateUserContext(currentUser);
 					}
 				}
-			}else{
+			} else {
 				buildAlertMessageNoLocation();
 			}
 			break;
@@ -246,8 +342,9 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 		}
 		return false;
 	}
+
 	private void updateUserContext(User user) {
-		
+
 		Log.d(TAG, "set url");
 		String url = Constant.url + "/updateuser";
 		HttpPost request = new HttpPost(url);
@@ -272,6 +369,36 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 			e.printStackTrace();
 		}
 	}
+
+	private void getLocationFromStreetName(String streetname) {
+		HttpGet httpGet = new HttpGet(
+				"http://maps.googleapis.com/maps/api/geocode/json?address="
+						+ streetname + "&sensor=false");
+		HttpClient client = new DefaultHttpClient();
+		HttpResponse response;
+		StringBuilder stringBuilder = new StringBuilder();
+
+		try {
+			response = client.execute(httpGet);
+			HttpEntity entity = response.getEntity();
+			InputStream stream = entity.getContent();
+			int b;
+			while ((b = stream.read()) != -1) {
+				stringBuilder.append((char) b);
+			}
+			
+			JSONObject jsonObject = new JSONObject(stringBuilder.toString());
+			JSONObject convert = new JSONObject();
+			convert = jsonObject.getJSONArray("results").getJSONObject(0);
+			convert = convert.getJSONObject("geometry").getJSONObject("location");
+			
+			lat = Double.valueOf(convert.getDouble("lat"));
+			lon = Double.valueOf(convert.getDouble("lng"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void startTimer() {
 		this.timer = new Timer();
 		Log.d(TAG, "timer starts.");
