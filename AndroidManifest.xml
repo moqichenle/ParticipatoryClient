@@ -89,6 +89,10 @@
             android:name=".query.AddQueryActivity"
             android:theme="@android:style/Theme.Holo" >
         </activity>
+        <activity
+            android:name=".query.QueryDetailActivity"
+            android:theme="@android:style/Theme.Holo" >
+        </activity>
 
         <service android:name=".activityrecognition.ActivityRecognitionIntentService" >
         </service>
