@@ -1,6 +1,5 @@
 package ie.tcd.scss.dsg.po;
 
-
 /**
  * 
  * @author Lele
@@ -15,12 +14,10 @@ public class ReportFromApp {
 	private byte categoryId;
 	private String contend;
 	private long reportTime;
-
+	private String streetName;
 	private byte[] attachment;
 	private User user;
 	
-	
-
 	public Long getReportId() {
 		return reportId;
 	}
@@ -61,6 +58,14 @@ public class ReportFromApp {
 		this.reportTime = reportTime;
 	}
 
+
+	public String getStreetName() {
+		return streetName;
+	}
+
+	public void setStreetName(String streetName) {
+		this.streetName = streetName;
+	}
 
 	public byte[] getAttachment() {
 		return attachment;

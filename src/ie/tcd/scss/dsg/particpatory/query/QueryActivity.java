@@ -1,10 +1,10 @@
-package ie.tcd.scss.dsg.particpatory.report;
+package ie.tcd.scss.dsg.particpatory.query;
 
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
-import ie.tcd.scss.dsg.po.ReportFromApp;
+import ie.tcd.scss.dsg.po.Query;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,28 +40,28 @@ import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class ReportActivity extends SlidingFragmentActivity {
-	private static final String TAG = "ReportActivity";
+public class QueryActivity extends SlidingFragmentActivity{
+	private static final String TAG = "QueryActivity";
 	private AppContext context;
 	private ListFragment mFrag;
 	private ListView listView;
 	private String results;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
-		setContentView(R.layout.activity_report);
+		setContentView(R.layout.activity_query);
 		setupSlidingMenu(savedInstanceState);
 		Log.d(TAG, "loaded");
-		listView = (ListView) findViewById(R.id.reportlist);
+		listView = (ListView) findViewById(R.id.queryList);
 		listView.setOnItemClickListener(this.listViewListener);
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
-		new ReportListTask().execute(Constant.url + "/reportlistofuser");
+		new QueryListTask().execute(Constant.url + "/queryofuser");
 	}
 
 	private OnItemClickListener listViewListener = new OnItemClickListener() {
@@ -70,13 +70,10 @@ public class ReportActivity extends SlidingFragmentActivity {
 		public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 			String itemValue = (String) listView.getItemAtPosition(pos);
 			String[] split = itemValue.split("_");
-			String reportId = split[0];
-			context.setReportId(reportId);
-//			Toast.makeText(getApplicationContext(),
-//					"Position :" + pos + "  reportId : " + reportId,
-//					Toast.LENGTH_LONG).show();
-			Intent certainReport = new Intent(context, ReportDetailActivity.class);
-			startActivity(certainReport);
+			String queryId = split[0];
+			context.setQueryId(queryId);
+			Intent certainQuery = new Intent(context, QueryDetailActivity.class);
+			startActivity(certainQuery);
 		}
 
 	};
@@ -93,7 +90,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 		case android.R.id.home:
 			break;
 		case R.id.menu_add:
-			Intent newEntryIntent = new Intent(this, AddReportActivity.class);
+			Intent newEntryIntent = new Intent(this, AddQueryActivity.class);
 			startActivity(newEntryIntent);
 			break;
 		}
@@ -126,7 +123,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 		// app can be clicked
 	}
 
-	private class ReportListTask extends AsyncTask<String, Void, HttpResponse> {
+	private class QueryListTask extends AsyncTask<String, Void, HttpResponse> {
 		@Override
 		protected HttpResponse doInBackground(String... urls) {
 			String url = urls[0];
@@ -164,12 +161,12 @@ public class ReportActivity extends SlidingFragmentActivity {
 					results = reader.readLine();
 					Gson gson = new Gson();
 					if(results!=null){
-						ReportFromApp[] reports = gson.fromJson(results, ReportFromApp[].class);
-						String[] values = new String[reports.length];
-						for (int i = 0; i < reports.length; i++) {
-							Log.d(TAG, "get report +" + reports[i].getReportId());
-							values[i] = reports[i].getReportId() + "_"
-									+ reports[i].getContend();
+						Query[] queries = gson.fromJson(results, Query[].class);
+						String[] values = new String[queries.length];
+						for (int i = 0; i < queries.length; i++) {
+							Log.d(TAG, "get report +" + queries[i].getQueryId());
+							values[i] = queries[i].getQueryId() + "_"
+									+ queries[i].getContent();
 						}
 
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -185,5 +182,4 @@ public class ReportActivity extends SlidingFragmentActivity {
 			}
 		}
 	}
-	
 }

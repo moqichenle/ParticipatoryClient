@@ -4,7 +4,7 @@ import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
-import ie.tcd.scss.dsg.po.Report;
+import ie.tcd.scss.dsg.po.ReportFromApp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,12 +23,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -44,27 +49,31 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 	private TextView report_content;
 	private TextView report_location;
 	private TextView report_time;
-
+	private ImageView imageToShow;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		context = (AppContext) getApplicationContext();
-		setContentView(R.layout.activity_report_detail);
-		setupSlidingMenu(savedInstanceState);
-		Log.d(TAG, "loaded");
-		String reportId = context.getReportId();
-		report_category = (TextView) findViewById(R.id.r_1);
-		report_content = (TextView) findViewById(R.id.r_2);
-		report_location = (TextView) findViewById(R.id.r_3);
-		report_time = (TextView) findViewById(R.id.r_4);
-
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
+		context = (AppContext) getApplicationContext();
+		String reportId = context.getReportId();
 		new ReportDetailTask()
 				.execute(Constant.url + "/reportdetail", reportId);
+		
+		setContentView(R.layout.activity_report_detail);
+		setupSlidingMenu(savedInstanceState);
+		Log.d(TAG, "loaded");
+		
+		report_category = (TextView) findViewById(R.id.r_1);
+		report_content = (TextView) findViewById(R.id.r_2);
+		report_location = (TextView) findViewById(R.id.r_3);
+		report_time = (TextView) findViewById(R.id.r_4);
+		imageToShow = (ImageView) findViewById(R.id.imageView1);;           
+		
+		
 	}
 
 	private void setupSlidingMenu(Bundle savedInstanceState) {
@@ -119,6 +128,7 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 			return response;
 		}
 
+		@SuppressLint("SimpleDateFormat")
 		@Override
 		protected void onPostExecute(HttpResponse response) {
 			if (response != null) {
@@ -128,17 +138,25 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 									.getContent(), "UTF-8"));
 					results = reader.readLine();
 					Gson gson = new Gson();
-					Report report = new Report();
-					report = gson.fromJson(results, Report.class);
-					Log.d(TAG, results);
+					ReportFromApp report = new ReportFromApp();
+					report = gson.fromJson(results, ReportFromApp.class);
 					report_category.setText(Constant.getCategoryName(report
 							.getCategoryId()));
 					report_content.setText(report.getContend());
-					report_location.setText(report.getStreetName());
+					String streetsName = report.getStreetName();
+					if(streetsName.length()>=50){
+						streetsName = streetsName.substring(0, 49);
+						streetsName+="...";
+					}
+					report_location.setText(streetsName);
 					Date myDate = new Date(report.getReportTime());
 					String reportDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(myDate);
 					report_time.setText(reportDate);
-
+					byte[] attach = report.getAttachment();
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					Bitmap bMap = BitmapFactory.decodeByteArray(attach, 0, attach.length,options);
+					imageToShow.setImageBitmap(bMap);
+					imageToShow.setVisibility(View.VISIBLE);
 				} catch (ParseException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

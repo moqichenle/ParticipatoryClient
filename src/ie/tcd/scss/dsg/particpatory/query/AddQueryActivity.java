@@ -1,14 +1,13 @@
-package ie.tcd.scss.dsg.particpatory.report;
+package ie.tcd.scss.dsg.particpatory.query;
 
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
-import ie.tcd.scss.dsg.po.ReportFromApp;
+import ie.tcd.scss.dsg.po.Query;
 import ie.tcd.scss.dsg.po.User;
 import ie.tcd.scss.dsg.po.UserLocation;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,57 +24,48 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class AddReportActivity extends SlidingFragmentActivity {
-	private static final String TAG = "AddReportActivity";
+public class AddQueryActivity extends SlidingFragmentActivity {
+	private static final String TAG = "AddQueryActivity";
 	private AppContext context;
 	private ListFragment mFrag;
-	private Spinner keywords;
-	private byte categoryId = 0;
-	private ArrayAdapter<CharSequence> keywordsAdapter;
 	private Location local;
 	private LocationManager locationManager;
-	private ImageView finding;
 	private Timer timer;
-	private String contend;
-	private ImageView attach;
-	private ImageView imageView;
 	private String formatted_address;
-	private User currentUser = new User();
-	private ReportFromApp report = new ReportFromApp();
+	private byte categoryId = 0;
+	private ImageView finding;
+	private TextView location_of_interest;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
-		setContentView(R.layout.activity_add_report);
+		setContentView(R.layout.activity_add_query);
 		setupSlidingMenu(savedInstanceState);
-		Log.d(TAG, "loaded");
-		Spinner category = (Spinner) findViewById(R.id.category);
+		Spinner category = (Spinner) findViewById(R.id.query_spinner);
 		ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter
 				.createFromResource(this, R.array.category_array,
 						android.R.layout.simple_spinner_item);
@@ -83,17 +73,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		category.setAdapter(categoryAdapter);
 
-		keywords = (Spinner) findViewById(R.id.hintword);
-		keywordsAdapter = ArrayAdapter.createFromResource(this,
-				R.array.keyword_array, android.R.layout.simple_spinner_item);
-		keywordsAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		keywords.setAdapter(keywordsAdapter);
-
-		keywords.setOnItemSelectedListener(this.selectKeyword);
 		category.setOnItemSelectedListener(this.selectCategory);
-
-		finding = (ImageView) findViewById(R.id.locationIcon);
 
 		// positioning
 		locationManager = (LocationManager) this
@@ -117,137 +97,8 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				500, 5, locationListener);
 		startTimer();
 
-		attach = (ImageView) findViewById(R.id.addAttachment);
-		attach.setOnClickListener(this.addAttachment);
-		imageView = (ImageView) findViewById(R.id.showpics);
-	}
-
-	private OnClickListener addAttachment = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			startActivityForResult(takePicture, 0);// zero can be replced with
-													// any action code
-		}
-
-	};
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			Intent imageReturnedIntent) {
-		super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-		if (requestCode == 0) {
-			if (imageReturnedIntent != null) {
-				Bitmap photo = (Bitmap) imageReturnedIntent.getExtras().get(
-						"data");
-				photo = Bitmap.createBitmap(photo);
-				imageView.setImageBitmap(photo);
-				imageView.setVisibility(View.VISIBLE);
-				
-				int bytes = photo.getByteCount();
-				System.out.println("@@@@@@@@bytes="+bytes);
-				ByteArrayOutputStream array = new ByteArrayOutputStream(bytes);
-				photo.compress(Bitmap.CompressFormat.PNG, 100, array); 
-				report.setAttachment(array.toByteArray());
-			}
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.actionbar_add_page, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			break;
-		case R.id.menu_submit:
-			Log.d(TAG, "submit report");
-			if (local != null && local.hasAccuracy()
-					&& local.getAccuracy() <= 50) {
-				finding.setImageResource(R.drawable.accept);
-				Log.d(TAG, "" + local.getAccuracy() + "*" + local.getLatitude());
-			} else {
-				buildAlertMessageNoLocation();
-			}
-
-			UserLocation currLocation = new UserLocation();
-			currLocation.setAccuracy(local.getAccuracy());
-			currLocation.setBearing(local.getBearing());
-			currLocation.setLatitude(local.getLatitude());
-			currLocation.setLongitude(local.getLongitude());
-			currLocation.setSpeed(local.getSpeed());
-			currentUser.setLocation(currLocation);
-
-			report.setCategoryId(categoryId);
-			report.setContend(contend);
-			report.setUserId(Long.valueOf(context.getUserId()));
-			report.setStreetName(formatted_address);
-			// TODO value below need to be changed
-			currentUser.setAverCycleSpeed(0);
-			currentUser.setAverDriveSpeed(0);
-			currentUser.setAverWalkSpeed(0);
-			currentUser.setMode("Walking");
-
-			// TODO streetsname using formatted_address
-			currentUser.setStreetName(formatted_address);
-			currentUser.setUserId(Long.valueOf(context.getUserId()));
-			report.setUser(currentUser);
-
-			if (android.os.Build.VERSION.SDK_INT > 9) {
-				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-						.permitAll().build();
-				StrictMode.setThreadPolicy(policy);
-			}
-			Log.d(TAG, "set url");
-			String url = Constant.url + "/newreport";
-			HttpPost request = new HttpPost(url);
-			Gson gson = new Gson();
-			String json = gson.toJson(report);
-			StringEntity entity;
-			try {
-				entity = new StringEntity(json, "UTF-8");
-				entity.setContentType("application/json");
-				request.setEntity(entity);
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpResponse response = httpClient.execute(request);
-				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-					Log.d(TAG, "request successfully");
-					Intent newIntent = new Intent(getApplicationContext(),
-							ReportActivity.class);
-					startActivity(newIntent);
-				} else {
-					Log.d(TAG, "failed");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-		return true;
-	}
-
-	private void startTimer() {
-		this.timer = new Timer();
-		Log.d(TAG, "timer starts.");
-		this.timer.schedule(new TimeTask(), 10000, 10000);
-	}
-
-	class TimeTask extends TimerTask {
-		@Override
-		public void run() {
-			Log.d(TAG, "load network provider");
-			local = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
-			timer.cancel();
-			timer.purge();
-		}
+		finding = (ImageView) findViewById(R.id.query_locationing);
+		location_of_interest = (TextView) findViewById(R.id.query_location_input);
 	}
 
 	private LocationListener locationListener = new LocationListener() {
@@ -289,18 +140,10 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				long id) {
 			String category = (String) parent.getItemAtPosition(pos);
 			if (category.equals("Select Category")) {
-				keywords.setAdapter(keywordsAdapter);
+				categoryId = -1;
 			} else if (category.equals("Traffic")) {
-				ArrayAdapter<CharSequence> tra_key = ArrayAdapter
-						.createFromResource(context, R.array.tra_keyword_array,
-								android.R.layout.simple_spinner_item);
-				keywords.setAdapter(tra_key);
 				categoryId = 0;
 			} else {
-				ArrayAdapter<CharSequence> imp_key = ArrayAdapter
-						.createFromResource(context, R.array.imp_keyword_array,
-								android.R.layout.simple_spinner_item);
-				keywords.setAdapter(imp_key);
 				categoryId = 1;
 			}
 		}
@@ -310,20 +153,143 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		}
 
 	};
-	private OnItemSelectedListener selectKeyword = new OnItemSelectedListener() {
 
-		@Override
-		public void onItemSelected(AdapterView<?> parent, View v, int pos,
-				long id) {
-			String keyword = (String) parent.getItemAtPosition(pos);
-			contend = keyword;
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.actionbar_add_page, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			break;
+		case R.id.menu_submit:
+			if (local != null && local.hasAccuracy()
+			&& local.getAccuracy() <= 50) {
+				Query newQuery = new Query();
+				if (categoryId == -1) {
+					Toast.makeText(context, "please select a category",
+							Toast.LENGTH_LONG).show();
+				} else {
+					if (android.os.Build.VERSION.SDK_INT > 9) {
+						StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+								.permitAll().build();
+						StrictMode.setThreadPolicy(policy);
+					}
+					newQuery.setCategoryId(categoryId);
+					String content = "would like to know the "
+							+ Constant.getCategoryName(categoryId) + "at "
+							+ location_of_interest;
+					newQuery.setContent(content);
+					newQuery.setLatitude(local.getLatitude());
+					newQuery.setLongitude(local.getLongitude());
+					newQuery.setQueryTime(System.currentTimeMillis());
+					newQuery.setStreetName(formatted_address);
+					newQuery.setUserId(Long.valueOf(context.getUserId()));
+					boolean flag = submitQuery(newQuery);
+					User currentUser = new User();
+					
+					
+					UserLocation currLocation = new UserLocation();
+					currLocation.setAccuracy(local.getAccuracy());
+					currLocation.setBearing(local.getBearing());
+					currLocation.setLatitude(local.getLatitude());
+					currLocation.setLongitude(local.getLongitude());
+					currLocation.setSpeed(local.getSpeed());
+					
+					currentUser.setLocation(currLocation);
+					//TODO average speed and mode.
+					currentUser.setAcceptPercent(context.getAcceptPercent());
+					currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
+					currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
+					currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+					currentUser.setMode(context.getMode());
+					currentUser.setStreetName(formatted_address);
+					currentUser.setUpdatedTime(System.currentTimeMillis());
+					currentUser.setUserId(Long.valueOf(context.getUserId()));
+					
+					if(flag){
+						updateUserContext(currentUser);
+					}
+				}
+			}else{
+				buildAlertMessageNoLocation();
+			}
+			break;
 		}
+		return true;
+	}
 
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
+	private boolean submitQuery(Query query) {
+		Log.d(TAG, "set url");
+		String url = Constant.url + "/newquery";
+		HttpPost request = new HttpPost(url);
+		Gson gson = new Gson();
+		String json = gson.toJson(query);
+		StringEntity entity;
+		try {
+			entity = new StringEntity(json, "UTF-8");
+			entity.setContentType("application/json");
+			request.setEntity(entity);
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse response = httpClient.execute(request);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				Log.d(TAG, "request successfully");
+				return true;
+			} else {
+				Log.d(TAG, "failed");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return false;
+	}
+	private void updateUserContext(User user) {
+		
+		Log.d(TAG, "set url");
+		String url = Constant.url + "/updateuser";
+		HttpPost request = new HttpPost(url);
+		Gson gson = new Gson();
+		String json = gson.toJson(user);
+		StringEntity entity;
+		try {
+			entity = new StringEntity(json, "UTF-8");
+			entity.setContentType("application/json");
+			request.setEntity(entity);
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse response = httpClient.execute(request);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				Log.d(TAG, "request successfully");
+				Intent newIntent = new Intent(getApplicationContext(),
+						QueryActivity.class);
+				startActivity(newIntent);
+			} else {
+				Log.d(TAG, "failed");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private void startTimer() {
+		this.timer = new Timer();
+		Log.d(TAG, "timer starts.");
+		this.timer.schedule(new TimeTask(), 10000, 10000);
+	}
 
-	};
+	class TimeTask extends TimerTask {
+		@Override
+		public void run() {
+			Log.d(TAG, "load network provider");
+			local = locationManager
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
+			timer.cancel();
+			timer.purge();
+		}
+	}
 
 	private void setupSlidingMenu(Bundle savedInstanceState) {
 

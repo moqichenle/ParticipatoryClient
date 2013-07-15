@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/textView4"
         android:layout_centerHorizontal="true"
-        android:text="Medium Text"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -65,11 +65,12 @@
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200sp"
+        android:layout_height="180sp"
         android:layout_alignLeft="@+id/textView10"
         android:layout_below="@+id/textView10"
-        android:src="@drawable/example" />
+        android:src="@drawable/example"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/r_2"
@@ -77,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/textView6"
         android:layout_alignLeft="@+id/r_1"
-        android:text="Medium Text"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -86,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/textView8"
         android:layout_alignLeft="@+id/r_2"
-        android:text="Medium Text"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -95,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/textView10"
         android:layout_alignLeft="@+id/r_3"
-        android:text="Medium Text"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView

@@ -53,20 +53,16 @@ public class UserRegister extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
-		// load content of the activity
 		setContentView(R.layout.activity_user_register);
 		Button userRegisterButton = (Button) findViewById(R.id.user_register_button);
 		userRegisterButton.setOnClickListener(this.userRegisterButtonListener);
 
-		// Acquire a reference to the system Location Manager
 		locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			buildAlertMessageNoGps();
 		}
 
-		// Register the listener with the Location Manager to receive location
-		// updates
 		local = locationManager
 				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -247,38 +243,3 @@ public class UserRegister extends Activity {
 	
 	
 }
-
-// private class NetworkTask extends AsyncTask<String, Void, HttpResponse>
-// {//put inside the main class
-// @Override
-// protected HttpResponse doInBackground(String... urls) {
-// String url = urls[0];
-// HttpGet request = new HttpGet(url);
-// HttpClient httpClient = new DefaultHttpClient();
-// HttpResponse response = null;
-// try {
-// response = httpClient.execute(request);
-// if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-// Log.d(TAG, "request successfully");
-// Log.d(TAG, EntityUtils.toString(response.getEntity()));
-// } else {
-// Log.d(TAG, "failed");
-// }
-// } catch (ClientProtocolException e) {
-// // TODO Auto-generated catch block
-// e.printStackTrace();
-// } catch (IOException e) {
-// // TODO Auto-generated catch block
-// e.printStackTrace();
-// }
-// return response;
-// }
-//
-//
-// @Override
-// protected void onPostExecute(HttpResponse result) {
-// // Do something with result
-// if (result != null)
-// result.getEntity().toString();
-// }
-// }

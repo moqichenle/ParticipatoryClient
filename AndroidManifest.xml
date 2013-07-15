@@ -22,7 +22,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    
     <!-- Request Activity Recognition Updates -->
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
@@ -80,6 +79,14 @@
         </activity>
         <activity
             android:name=".report.ReportDetailActivity"
+            android:theme="@android:style/Theme.Holo" >
+        </activity>
+        <activity
+            android:name=".query.QueryActivity"
+            android:theme="@android:style/Theme.Holo" >
+        </activity>
+        <activity
+            android:name=".query.AddQueryActivity"
             android:theme="@android:style/Theme.Holo" >
         </activity>
 

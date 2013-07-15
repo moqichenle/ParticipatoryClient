@@ -1,5 +1,6 @@
 package ie.tcd.scss.dsg.particpatory;
 
+import ie.tcd.scss.dsg.particpatory.query.QueryActivity;
 import ie.tcd.scss.dsg.particpatory.report.ReportActivity;
 import ie.tcd.scss.dsg.particpatory.user.UserProfile;
 
@@ -111,6 +112,8 @@ public class SampleListFragment extends ListFragment {
 			startActivity(newIntent);
 			break;
 		case 2:// questions
+			newIntent = new Intent(context, QueryActivity.class);
+			startActivity(newIntent);
 			break;
 		case 3:// tasks
 			break;

@@ -18,7 +18,7 @@ public class AppContext extends Application {
 	private int acceptedTaskAmount;
 	private String reportId;
 	private String taskId;
-
+	private String queryId;
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -140,6 +140,14 @@ public class AppContext extends Application {
 
 	public void setTaskId(String taskId) {
 		this.taskId = taskId;
+	}
+
+	public String getQueryId() {
+		return queryId;
+	}
+
+	public void setQueryId(String queryId) {
+		this.queryId = queryId;
 	}
 
 }
