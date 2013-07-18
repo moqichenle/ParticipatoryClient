@@ -24,12 +24,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -62,7 +65,24 @@ public class QueryDetailActivity extends SlidingFragmentActivity {
 		setupSlidingMenu(savedInstanceState);
 		
 	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.actionbar_show_map, menu);
+		return true;
+	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			break;
+		case R.id.menu_show:
+			Intent newEntryIntent = new Intent(this, QueryResultActivity.class);
+			startActivity(newEntryIntent);
+			break;
+		}
+		return true;
+	}
 	private void setupSlidingMenu(Bundle savedInstanceState) {
 
 		setBehindContentView(R.layout.menu_frame);

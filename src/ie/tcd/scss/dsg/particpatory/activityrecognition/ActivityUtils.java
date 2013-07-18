@@ -9,8 +9,6 @@ public final class ActivityUtils {
     // Used to track what type of request is in process
     public enum REQUEST_TYPE {ADD, REMOVE}
 
-    public static final String APPTAG = "ActivitySample";
-
     /*
      * Define a request code to send to Google Play services
      * This code is returned in Activity.onActivityResult

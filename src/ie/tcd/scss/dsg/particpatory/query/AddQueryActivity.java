@@ -277,9 +277,10 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					newQuery.setCategoryId(categoryId);
 					String content = "would like to know the "
 							+ Constant.getCategoryName(categoryId) + "at "
-							+ location_of_interest;
+							+ location_of_interest.getText().toString();
 					newQuery.setContent(content);
-					getLocationFromStreetName(location_of_interest.getText().toString());
+//					getLocationFromStreetName(location_of_interest.getText().toString().replaceAll(" ", ""));
+					getLocationFromStreetName("42PearseStreetDublinIreland");
 					newQuery.setLatitude(lat);
 					newQuery.setLongitude(lon);
 					newQuery.setQueryTime(System.currentTimeMillis());

@@ -16,19 +16,18 @@
 
 package ie.tcd.scss.dsg.particpatory.activityrecognition;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
-import com.google.android.gms.location.ActivityRecognitionClient;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.ActivityRecognitionClient;
 
 /**
  * Class for connecting to Location Services and removing activity recognition updates.
@@ -142,9 +141,6 @@ public class DetectionRemover
      */
     @Override
     public void onConnected(Bundle connectionData) {
-        // If debugging, log the connection
-//        Log.d(ActivityUtils.APPTAG, mContext.getString(R.string.connected));
-        // Send a request to Location Services to remove activity recognition updates
         continueRemoveUpdates();
     }
 

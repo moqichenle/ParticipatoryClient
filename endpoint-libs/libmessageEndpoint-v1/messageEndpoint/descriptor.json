@@ -1,16 +1,16 @@
 {
   "files": [
     {
-      "path": "myapp-messageEndpoint-v1-20130619111636-java-1.15.0-rc-sources.jar", 
+      "path": "myapp-messageEndpoint-v1-20130718114440-java-1.15.0-rc-sources.jar", 
       "type": "source"
     }, 
     {
-      "path": "myapp-messageEndpoint-v1-20130619111636-java-1.15.0-rc.jar.properties", 
+      "path": "myapp-messageEndpoint-v1-20130718114440-java-1.15.0-rc.jar.properties", 
       "type": "android.properties"
     }
   ], 
   "kind": "discovery#directoryItem", 
-  "moduleName": "ie.tcd.scss.dsg.particpatory", 
+  "moduleName": "com.waterdrinkreminder", 
   "name": "messageEndpoint", 
   "language": "java", 
   "proguard-config": "proguard-google-api-client.txt", 
@@ -689,7 +689,7 @@
     }
   ], 
   "language_version": "1.15.0-rc", 
-  "revision": 20130619111636, 
+  "revision": 20130718114440, 
   "id": "messageEndpoint:v1", 
-  "modulePath": "ie/tcd/scss/dsg/particpatory"
+  "modulePath": "com/waterdrinkreminder"
 }
