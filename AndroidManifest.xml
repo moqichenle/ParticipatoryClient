@@ -51,7 +51,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".GCMIntentService" />
+        <service android:name=".GCMIntentService" android:enabled="true"/>
 
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
@@ -111,10 +111,14 @@
         <service android:name=".activityrecognition.ActivityRecognitionIntentService" >
         </service>
 
+        <activity
+            android:name=".query.QueryResultActivity"
+            android:theme="@android:style/Theme.Holo" >
+        </activity>
+
         <meta-data
-            android:name="com.google.android.maps.v2.AIzaSyCkdZtUn3Y3kcR2Qnv51qI1f9ysWB7faP8"
+            android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCkdZtUn3Y3kcR2Qnv51qI1f9ysWB7faP8" />
-        <activity android:name=".query.QueryResultActivity"></activity>
     </application>
 
 </manifest>

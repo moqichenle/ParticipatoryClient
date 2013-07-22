@@ -1,31 +1,29 @@
 package ie.tcd.scss.dsg.particpatory;
 
-import java.io.IOException;
-
 import ie.tcd.scss.dsg.particpatory.messageEndpoint.MessageEndpoint;
 import ie.tcd.scss.dsg.particpatory.messageEndpoint.model.CollectionResponseMessageData;
 import ie.tcd.scss.dsg.particpatory.messageEndpoint.model.MessageData;
+import ie.tcd.scss.dsg.particpatory.user.UserRegister;
 
-import com.google.android.gcm.GCMRegistrar;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.json.jackson.JacksonFactory;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.json.jackson.JacksonFactory;
 
 /**
  * An activity that communicates with your App Engine backend via Cloud
@@ -197,11 +195,11 @@ public class RegisterActivity extends Activity {
 		Button registerButton = (Button) findViewById(R.id.regButton);
 		switch (newState) {
 		case REGISTERED:
-			 registerButton.setText("Unregister");
-			 registerButton.setOnTouchListener(unregisterListener);
-			 registerButton.setEnabled(true);
-//			Intent intent = new Intent(this, UserRegister.class);
-//			startActivity(intent);
+//			 registerButton.setText("Unregister");
+//			 registerButton.setOnTouchListener(unregisterListener);
+//			 registerButton.setEnabled(true);
+			Intent intent = new Intent(this, UserRegister.class);
+			startActivity(intent);
 			break;
 
 		case REGISTERING:
@@ -241,6 +239,7 @@ public class RegisterActivity extends Activity {
 	private class QueryMessagesTask extends
 			AsyncTask<Void, Void, CollectionResponseMessageData> {
 		Exception exceptionThrown = null;
+		@SuppressWarnings("unused")
 		Activity activity;
 		MessageEndpoint messageEndpoint;
 

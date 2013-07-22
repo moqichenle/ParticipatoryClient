@@ -4,6 +4,6 @@
  <item
         android:id="@+id/menu_show"
         android:icon="@drawable/list"
-        android:showAsAction="withText"
+        android:showAsAction="ifRoom|withText"
         android:title="Display Results"/>
 </menu>

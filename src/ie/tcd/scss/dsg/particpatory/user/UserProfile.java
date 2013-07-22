@@ -42,7 +42,7 @@ public class UserProfile extends SlidingFragmentActivity implements
 	private AppContext context;
 	private ListFragment mFrag;
 	private TextView mode;
-
+	private boolean hasValue=true;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,11 +60,13 @@ public class UserProfile extends SlidingFragmentActivity implements
 				ActivityRecognitionIntentService.class);
 		mActivityRecognitionPendingIntent = PendingIntent.getService(context,
 				0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		registerReceiver(mUpdateReceiver, new IntentFilter(
-				"ie.tcd.scss.dsg.particpatory.UPDATE"));
-		mReceiverRegistered = true;
+		
 		startUpdates();
-
+//		while(hasValue){
+			registerReceiver(mUpdateReceiver, new IntentFilter(
+					"ie.tcd.scss.dsg.particpatory.UPDATE"));
+			mReceiverRegistered = true;
+//		}
 		Log.d(TAG, "get User");
 		String nickName = context.getNickName();
 		TextView userName = (TextView) findViewById(R.id.userName);
@@ -89,6 +91,7 @@ public class UserProfile extends SlidingFragmentActivity implements
 					.getStringExtra(ActivityRecognitionIntentService.RECOGNITION_RESULT);
 			mode.setText(result);
 			context.setMode(result);
+			hasValue = false;
 		}
 	};
 

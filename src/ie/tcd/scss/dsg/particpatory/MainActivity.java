@@ -61,6 +61,8 @@ public class MainActivity extends Activity {
 			Intent intent = new Intent(this, UserProfile.class);
 			startActivity(intent);
 		}
+//		Intent intent = new Intent(this, RegisterActivity.class);
+//		startActivity(intent);
 		finish();
 
 	}

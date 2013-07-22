@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
@@ -112,30 +113,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 
 		location_of_interest.addTextChangedListener(this.searchLocation);
 		location_of_interest.setThreshold(3);
-		// location_of_interest.setOnClickListener(new OnClickListener(){
-		// @Override
-		// public void onClick(View arg0) {
-		// location_of_interest.setDropDownHeight(LayoutParams.WRAP_CONTENT);
-		// }
-		// });
-		// location_of_interest.setOnItemClickListener(new
-		// OnItemClickListener(){
-		// @Override
-		// public void onItemClick(AdapterView<?> listView, View arg1, int
-		// position, long arg3) {
-		// try
-		// {
-		// String venue = (String)listView.getItemAtPosition(position);
-		// location_of_interest.setText(venue);
-		// location_of_interest.dismissDropDown();
-		// location_of_interest.setDropDownHeight(0);
-		// }
-		// catch(Exception e)
-		// {
-		// Log.v("erros", e.toString());
-		// }
-		// }
-		// });
 	}
 
 	private TextWatcher searchLocation = new TextWatcher() {
@@ -148,40 +125,7 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				StrictMode.setThreadPolicy(policy);
 			}
 			String street = input.toString().replaceAll(" ", "");
-			Log.d(TAG, "###" + input);
-			Log.d(TAG, "**" + street);
-			HttpGet httpGet = new HttpGet(
-					"http://maps.googleapis.com/maps/api/geocode/json?address="
-							+ street + "&sensor=false");
-			HttpClient client = new DefaultHttpClient();
-			HttpResponse response;
-			StringBuilder stringBuilder = new StringBuilder();
-			try {
-				response = client.execute(httpGet);
-				HttpEntity entity = response.getEntity();
-				InputStream stream = entity.getContent();
-				int b;
-				while ((b = stream.read()) != -1) {
-					stringBuilder.append((char) b);
-				}
-
-				JSONObject object = new JSONObject(stringBuilder.toString());
-				JSONArray array = object.getJSONArray("results");
-				String[] addresses = new String[array.length()];
-				for (int i = 0; i < array.length(); i++) {
-					addresses[i] = array.getJSONObject(i).getString(
-							"formatted_address");
-					Log.d(TAG, addresses[i]);
-					if (i == 2)
-						break;
-				}
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-						context, android.R.layout.simple_list_item_1, addresses);
-				location_of_interest.setAdapter(adapter);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-
+			new AutoCompleteTask().execute(street);
 		}
 
 		@Override
@@ -216,6 +160,7 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				locationManager.removeUpdates(locationListener);
 			}
 		}
 
@@ -296,17 +241,25 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					currLocation.setLongitude(local.getLongitude());
 					currLocation.setSpeed(local.getSpeed());
 
-					currentUser.setLocation(currLocation);
+					
 					// TODO average speed and mode.
-					currentUser.setAcceptPercent(context.getAcceptPercent());
-					currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
-					currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
-					currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+//					currentUser.setAcceptPercent(context.getAcceptPercent());
+//					currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
+//					currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
+//					currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+//					currentUser.setMode(context.getMode());
+//					currentUser.setStreetName(formatted_address);
+//					currentUser.setUpdatedTime(System.currentTimeMillis());
+//					currentUser.setUserId(Long.valueOf(context.getUserId()));
+					currentUser.setAcceptPercent(0);
+					currentUser.setAverCycleSpeed(0);
+					currentUser.setAverDriveSpeed(0);
+					currentUser.setAverWalkSpeed(0);
 					currentUser.setMode(context.getMode());
+					currentUser.setLocation(currLocation);
 					currentUser.setStreetName(formatted_address);
 					currentUser.setUpdatedTime(System.currentTimeMillis());
 					currentUser.setUserId(Long.valueOf(context.getUserId()));
-
 					if (flag) {
 						updateUserContext(currentUser);
 					}
@@ -447,7 +400,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		locationManager.removeUpdates(locationListener);
 
 	}
 
@@ -493,5 +445,57 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				});
 		final AlertDialog alert = builder.create();
 		alert.show();
+	}
+	
+	private class AutoCompleteTask extends AsyncTask<String, Void, HttpResponse> {
+		@Override
+		protected HttpResponse doInBackground(String... urls) {
+			String street = urls[0];
+			HttpGet httpGet = new HttpGet(
+					"http://maps.googleapis.com/maps/api/geocode/json?address="
+							+ street + "&sensor=false");
+			HttpClient client = new DefaultHttpClient();
+			HttpResponse response = null;
+			try {
+				response = client.execute(httpGet);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			return response;
+		}
+
+		@Override
+		protected void onPostExecute(HttpResponse response) {
+			// Do something with result
+			if (response != null) {
+				HttpEntity entity = response.getEntity();
+				InputStream stream;
+				try {
+					stream = entity.getContent();
+					int b;
+					StringBuilder stringBuilder = new StringBuilder();
+					while ((b = stream.read()) != -1) {
+						stringBuilder.append((char) b);
+					}
+					JSONObject object = new JSONObject(stringBuilder.toString());
+					JSONArray array = object.getJSONArray("results");
+					String[] addresses = new String[array.length()];
+					for (int i = 0; i < array.length(); i++) {
+						addresses[i] = array.getJSONObject(i).getString(
+								"formatted_address");
+						Log.d(TAG, addresses[i]);
+						if (i == 2)
+							break;
+					}
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+							context, android.R.layout.simple_list_item_1, addresses);
+					location_of_interest.setAdapter(adapter);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
 	}
 }

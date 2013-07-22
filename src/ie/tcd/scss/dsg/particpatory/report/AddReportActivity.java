@@ -74,6 +74,13 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		context = (AppContext) getApplicationContext();
 		setContentView(R.layout.activity_add_report);
 		setupSlidingMenu(savedInstanceState);
+		// positioning
+		locationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
+		// GPS_PROVIDER
+		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			buildAlertMessageNoGps();
+		}
 		Log.d(TAG, "loaded");
 		Spinner category = (Spinner) findViewById(R.id.category);
 		ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter
@@ -95,9 +102,6 @@ public class AddReportActivity extends SlidingFragmentActivity {
 
 		finding = (ImageView) findViewById(R.id.locationIcon);
 
-		// positioning
-		locationManager = (LocationManager) this
-				.getSystemService(Context.LOCATION_SERVICE);
 		Log.d(TAG, "try to get last known location from GPS");
 		local = locationManager
 				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -107,10 +111,6 @@ public class AddReportActivity extends SlidingFragmentActivity {
 					"NO last known location from GPS,try to get from network");
 			local = locationManager
 					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		}
-		// GPS_PROVIDER
-		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			buildAlertMessageNoGps();
 		}
 
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -144,11 +144,11 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				photo = Bitmap.createBitmap(photo);
 				imageView.setImageBitmap(photo);
 				imageView.setVisibility(View.VISIBLE);
-				
+
 				int bytes = photo.getByteCount();
-				System.out.println("@@@@@@@@bytes="+bytes);
+				System.out.println("@@@@@@@@bytes=" + bytes);
 				ByteArrayOutputStream array = new ByteArrayOutputStream(bytes);
-				photo.compress(Bitmap.CompressFormat.PNG, 100, array); 
+				photo.compress(Bitmap.CompressFormat.PNG, 100, array);
 				report.setAttachment(array.toByteArray());
 			}
 		}

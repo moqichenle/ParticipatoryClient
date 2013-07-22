@@ -5,7 +5,10 @@ import java.net.URLEncoder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -39,9 +42,9 @@ import ie.tcd.scss.dsg.particpatory.user.UserRegister;
  */
 public class GCMIntentService extends GCMBaseIntentService {
 	private final Deviceinfoendpoint endpoint;
-
+	private static final String TAG = "GCMIntentService";
 	/*
-	 * TODO: Set this to a valid project number. See
+	 * Set this to a valid project number. See
 	 * http://developers.google.com/eclipse/docs/cloud_endpoint for more
 	 * information.
 	 */
@@ -110,10 +113,22 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 */
 	@Override
 	public void onMessage(Context context, Intent intent) {
-		sendNotificationIntent(
-				context,
-				"Message received via Google Cloud Messaging:\n\n"
-						+ intent.getStringExtra("message"), true, false);
+		// TODO make use of this to show a task notification.
+		Log.d(TAG, "receive messages from server.");
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			@Override
+			public void run() {
+				Log.d(TAG, "MESSAGE!!!");
+				Toast.makeText(getApplicationContext(), "New message!!",
+						Toast.LENGTH_LONG).show();
+			}
+		});
+
+		// sendNotificationIntent(
+		// context,
+		// "Message received via Google Cloud Messaging:\n\n"
+		// + intent.getStringExtra("message"), true, false);
 	}
 
 	/**

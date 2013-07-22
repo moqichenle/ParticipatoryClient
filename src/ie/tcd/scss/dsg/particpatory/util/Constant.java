@@ -10,6 +10,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.os.StrictMode;
+
 public class Constant {
 	public static String url ="http://192.168.1.10:8888";//10.6.33.177  192.168.1.10
 	
@@ -52,5 +54,12 @@ public class Constant {
 			e.printStackTrace();
 		}
 		return jsonObject;
+	}
+	public static void setupConnectin(){
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
 	}
 }
