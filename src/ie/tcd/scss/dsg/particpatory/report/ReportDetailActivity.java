@@ -152,11 +152,15 @@ public class ReportDetailActivity extends SlidingFragmentActivity {
 					Date myDate = new Date(report.getReportTime());
 					String reportDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(myDate);
 					report_time.setText(reportDate);
-					byte[] attach = report.getAttachment();
-					BitmapFactory.Options options = new BitmapFactory.Options();
-					Bitmap bMap = BitmapFactory.decodeByteArray(attach, 0, attach.length,options);
-					imageToShow.setImageBitmap(bMap);
-					imageToShow.setVisibility(View.VISIBLE);
+					if(report.getAttachment()!=null){
+						TextView atta = (TextView) findViewById(R.id.textView10);
+						atta.setVisibility(View.VISIBLE);
+						byte[] attach = report.getAttachment();
+						BitmapFactory.Options options = new BitmapFactory.Options();
+						Bitmap bMap = BitmapFactory.decodeByteArray(attach, 0, attach.length,options);
+						imageToShow.setImageBitmap(bMap);
+						imageToShow.setVisibility(View.VISIBLE);
+					}
 				} catch (ParseException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import android.os.StrictMode;
 
 public class Constant {
-	public static String url ="http://192.168.1.10:8888";//10.6.33.177  192.168.1.10
+	public static String url ="http://10.6.33.177:8888";//10.6.33.177  192.168.1.10
 	
 	public static String getCategoryName(byte id){
 		if(id==(byte)0){

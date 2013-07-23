@@ -61,7 +61,8 @@
         android:layout_below="@+id/textView8"
         android:layout_marginTop="22dp"
         android:text="Attachment:"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:visibility="invisible"/>
 
     <ImageView
         android:id="@+id/imageView1"

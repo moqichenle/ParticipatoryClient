@@ -30,7 +30,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
@@ -67,7 +66,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 	private String formatted_address;
 	private User currentUser = new User();
 	private ReportFromApp report = new ReportFromApp();
-
+	private boolean hasPhoto = false;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -150,6 +149,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				ByteArrayOutputStream array = new ByteArrayOutputStream(bytes);
 				photo.compress(Bitmap.CompressFormat.PNG, 100, array);
 				report.setAttachment(array.toByteArray());
+				hasPhoto = true;
 			}
 		}
 	}
@@ -197,12 +197,10 @@ public class AddReportActivity extends SlidingFragmentActivity {
 			currentUser.setStreetName(formatted_address);
 			currentUser.setUserId(Long.valueOf(context.getUserId()));
 			report.setUser(currentUser);
-
-			if (android.os.Build.VERSION.SDK_INT > 9) {
-				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-						.permitAll().build();
-				StrictMode.setThreadPolicy(policy);
+			if(!hasPhoto){
+				report.setAttachment(null);
 			}
+			Constant.setupConnectin();
 			Log.d(TAG, "set url");
 			String url = Constant.url + "/newreport";
 			HttpPost request = new HttpPost(url);

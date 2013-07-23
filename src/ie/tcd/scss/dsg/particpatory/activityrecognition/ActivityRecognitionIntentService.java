@@ -68,7 +68,7 @@ public class ActivityRecognitionIntentService extends IntentService {
 			// Get the type of activity
 			int activityType = mostProbableActivity.getType();
 			Log.d("ActivityRecognitionIntentService", getNameFromType(activityType)+"***"+confidence);
-			if(confidence>=80&&!getNameFromType(activityType).equals("UNKNOWN")){
+			if(confidence>=70&&!getNameFromType(activityType).equals("UNKNOWN")){
 				Editor editor = mPrefs.edit();
 				editor.putString("mode", getNameFromType(activityType));
 				editor.commit();

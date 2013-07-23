@@ -24,7 +24,6 @@ import org.apache.http.message.BasicNameValuePair;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -56,11 +55,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 		Log.d(TAG, "loaded");
 		listView = (ListView) findViewById(R.id.reportlist);
 		listView.setOnItemClickListener(this.listViewListener);
-		if (android.os.Build.VERSION.SDK_INT > 9) {
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-		}
+		Constant.setupConnectin();
 		new ReportListTask().execute(Constant.url + "/reportlistofuser");
 	}
 

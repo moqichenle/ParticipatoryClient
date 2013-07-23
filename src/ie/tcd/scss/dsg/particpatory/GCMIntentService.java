@@ -1,5 +1,9 @@
 package ie.tcd.scss.dsg.particpatory;
 
+import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.Deviceinfoendpoint;
+import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.model.DeviceInfo;
+import ie.tcd.scss.dsg.particpatory.user.UserRegister;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -16,10 +20,6 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.json.jackson.JacksonFactory;
-
-import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.Deviceinfoendpoint;
-import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.model.DeviceInfo;
-import ie.tcd.scss.dsg.particpatory.user.UserRegister;
 
 /**
  * This class is started up as a service of the Android application. It listens

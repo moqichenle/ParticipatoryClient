@@ -1,18 +1,18 @@
 package ie.tcd.scss.dsg.particpatory;
 
-import com.google.api.client.googleapis.json.GoogleJsonError;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.googleapis.services.AbstractGoogleClient;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import ie.tcd.scss.dsg.particpatory.util.Constant;
+
+import java.io.IOException;
 
 import android.app.Activity;
 import android.util.Log;
 import android.widget.Toast;
 
-import ie.tcd.scss.dsg.particpatory.util.Constant;
-
-import java.io.IOException;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.googleapis.services.AbstractGoogleClient;
+import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 /**
  * Common utilities for working with Cloud Endpoints.
