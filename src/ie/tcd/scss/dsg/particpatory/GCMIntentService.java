@@ -2,17 +2,24 @@ package ie.tcd.scss.dsg.particpatory;
 
 import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.Deviceinfoendpoint;
 import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.model.DeviceInfo;
+import ie.tcd.scss.dsg.particpatory.task.TaskDetailActivity;
+import ie.tcd.scss.dsg.particpatory.user.UserProfile;
 import ie.tcd.scss.dsg.particpatory.user.UserRegister;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -113,17 +120,41 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 */
 	@Override
 	public void onMessage(Context context, Intent intent) {
-		// TODO make use of this to show a task notification.
 		Log.d(TAG, "receive messages from server.");
-		Handler h = new Handler(Looper.getMainLooper());
-		h.post(new Runnable() {
-			@Override
-			public void run() {
-				Log.d(TAG, "MESSAGE!!!");
-				Toast.makeText(getApplicationContext(), "New message!!",
-						Toast.LENGTH_LONG).show();
-			}
-		});
+		// Handler h = new Handler(Looper.getMainLooper());
+		// h.post(new Runnable() {
+		// @Override
+		// public void run() {
+		// Log.d(TAG, "MESSAGE!!!");
+		// Toast.makeText(getApplicationContext(), "New message!!",
+		// Toast.LENGTH_LONG).show();
+		// }
+		// });
+		Bitmap bm = BitmapFactory.decodeResource(getResources(),
+				R.drawable.task);
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				this).setLargeIcon(bm).setSmallIcon(R.drawable.task)
+				.setContentTitle("A New Task!")
+				.setWhen(System.currentTimeMillis()).setAutoCancel(true);
+		String message = intent.getStringExtra("message");
+		
+		SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
+		//save into sharedPreference
+		Editor editor = shared.edit();
+		editor.putString("taskInfo", message);
+		editor.commit();
+		Intent resultIntent = new Intent(this, TaskDetailActivity.class);
+
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+		stackBuilder.addParentStack(UserProfile.class);
+		stackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+		mBuilder.setContentIntent(resultPendingIntent);
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		int mId = 1;//what s this?
+		// mId allows you to update the notification later on.
+		mNotificationManager.notify(mId, mBuilder.build());
 
 		// sendNotificationIntent(
 		// context,

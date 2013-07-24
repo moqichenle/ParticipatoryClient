@@ -51,7 +51,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".GCMIntentService" android:enabled="true"/>
+        <service
+            android:name=".GCMIntentService"
+            android:enabled="true" />
 
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
@@ -113,6 +115,10 @@
 
         <activity
             android:name=".query.QueryResultActivity"
+            android:theme="@android:style/Theme.Holo" >
+        </activity>
+        <activity
+            android:name=".task.TaskDetailActivity"
             android:theme="@android:style/Theme.Holo" >
         </activity>
 

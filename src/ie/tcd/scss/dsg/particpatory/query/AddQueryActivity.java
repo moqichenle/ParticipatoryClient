@@ -229,7 +229,7 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					newQuery.setLatitude(lat);
 					newQuery.setLongitude(lon);
 					newQuery.setQueryTime(System.currentTimeMillis());
-					newQuery.setStreetName(formatted_address);
+					newQuery.setStreetName(location_of_interest.getText().toString());
 					newQuery.setUserId(Long.valueOf(context.getUserId()));
 					boolean flag = submitQuery(newQuery);
 					User currentUser = new User();
@@ -491,7 +491,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 							context, android.R.layout.simple_list_item_1, addresses);
 					location_of_interest.setAdapter(adapter);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				

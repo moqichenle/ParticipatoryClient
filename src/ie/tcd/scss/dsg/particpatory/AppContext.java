@@ -19,6 +19,7 @@ public class AppContext extends Application {
 	private String reportId;
 	private String taskId;
 	private String queryId;
+	private String taskInfo;
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -44,6 +45,8 @@ public class AppContext extends Application {
 		setTaskingAmount(overall);
 		int acceptAmount = sharedPreferences.getInt("acceptAmount", 0);
 		setAcceptedTaskAmount(acceptAmount);
+		String taskInformation = sharedPreferences.getString("taskInfo", null);
+		setTaskInfo(taskInformation);
 	}
 
 	public String getUserId() {
@@ -148,6 +151,14 @@ public class AppContext extends Application {
 
 	public void setQueryId(String queryId) {
 		this.queryId = queryId;
+	}
+
+	public String getTaskInfo() {
+		return taskInfo;
+	}
+
+	public void setTaskInfo(String taskInfo) {
+		this.taskInfo = taskInfo;
 	}
 
 }
