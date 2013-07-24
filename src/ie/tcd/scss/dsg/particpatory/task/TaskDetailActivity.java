@@ -29,6 +29,7 @@ public class TaskDetailActivity extends SlidingFragmentActivity {
 		TextView description = (TextView) findViewById(R.id.task_des);
 		description.setText(subMsg[0]);
 		int expireTime = Integer.valueOf(subMsg[1]);
+		String assignId = subMsg[3];
 		taskId = subMsg[2];
 	}
 
