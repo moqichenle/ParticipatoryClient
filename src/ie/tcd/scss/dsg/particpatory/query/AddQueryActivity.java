@@ -6,7 +6,6 @@ import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.Query;
 import ie.tcd.scss.dsg.po.User;
-import ie.tcd.scss.dsg.po.UserLocation;
 
 import java.io.InputStream;
 import java.util.Timer;
@@ -224,8 +223,8 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 							+ Constant.getCategoryName(categoryId) + "at "
 							+ location_of_interest.getText().toString();
 					newQuery.setContent(content);
-//					getLocationFromStreetName(location_of_interest.getText().toString().replaceAll(" ", ""));
-					getLocationFromStreetName("42PearseStreetDublinIreland");
+					getLocationFromStreetName(location_of_interest.getText().toString().replaceAll(" ", ""));
+//					getLocationFromStreetName("42PearseStreetDublinIreland");
 					newQuery.setLatitude(lat);
 					newQuery.setLongitude(lon);
 					newQuery.setQueryTime(System.currentTimeMillis());
@@ -234,12 +233,11 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					boolean flag = submitQuery(newQuery);
 					User currentUser = new User();
 
-					UserLocation currLocation = new UserLocation();
-					currLocation.setAccuracy(local.getAccuracy());
-					currLocation.setBearing(local.getBearing());
-					currLocation.setLatitude(local.getLatitude());
-					currLocation.setLongitude(local.getLongitude());
-					currLocation.setSpeed(local.getSpeed());
+					currentUser.setAccuracy(local.getAccuracy());
+					currentUser.setBearing(local.getBearing());
+					currentUser.setLatitude(local.getLatitude());
+					currentUser.setLongitude(local.getLongitude());
+					currentUser.setSpeed(local.getSpeed());
 
 					
 					// TODO average speed and mode.
@@ -256,7 +254,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					currentUser.setAverDriveSpeed(0);
 					currentUser.setAverWalkSpeed(0);
 					currentUser.setMode(context.getMode());
-					currentUser.setLocation(currLocation);
 					currentUser.setStreetName(formatted_address);
 					currentUser.setUpdatedTime(System.currentTimeMillis());
 					currentUser.setUserId(Long.valueOf(context.getUserId()));
@@ -484,8 +481,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 						addresses[i] = array.getJSONObject(i).getString(
 								"formatted_address");
 						Log.d(TAG, addresses[i]);
-						if (i == 2)
-							break;
 					}
 					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 							context, android.R.layout.simple_list_item_1, addresses);

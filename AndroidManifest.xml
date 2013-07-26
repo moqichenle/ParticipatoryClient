@@ -118,7 +118,11 @@
             android:theme="@android:style/Theme.Holo" >
         </activity>
         <activity
-            android:name=".task.TaskDetailActivity"
+            android:name=".task.NewTaskActivity"
+            android:theme="@android:style/Theme.Holo" >
+        </activity>
+        <activity
+            android:name=".task.TaskActivity"
             android:theme="@android:style/Theme.Holo" >
         </activity>
 

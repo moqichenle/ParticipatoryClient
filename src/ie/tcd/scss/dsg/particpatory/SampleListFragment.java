@@ -2,6 +2,7 @@ package ie.tcd.scss.dsg.particpatory;
 
 import ie.tcd.scss.dsg.particpatory.query.QueryActivity;
 import ie.tcd.scss.dsg.particpatory.report.ReportActivity;
+import ie.tcd.scss.dsg.particpatory.task.TaskActivity;
 import ie.tcd.scss.dsg.particpatory.user.UserProfile;
 
 import java.lang.reflect.Constructor;
@@ -116,6 +117,8 @@ public class SampleListFragment extends ListFragment {
 			startActivity(newIntent);
 			break;
 		case 3:// tasks
+			newIntent = new Intent(context, TaskActivity.class);
+			startActivity(newIntent);
 			break;
 		case 4:// settings
 			break;

@@ -4,7 +4,6 @@ import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.User;
-import ie.tcd.scss.dsg.po.UserLocation;
 
 import java.io.IOException;
 
@@ -200,13 +199,13 @@ public class UserRegister extends Activity {
 			u.setAverDriveSpeed(0);
 			u.setAverWalkSpeed(0);
 			u.setHasSensor((byte)48);
-			UserLocation userLocation = new UserLocation();
-			userLocation.setAccuracy(location.getAccuracy());
-			userLocation.setBearing(location.getBearing());
-			userLocation.setLatitude(location.getLatitude());
-			userLocation.setLongitude(location.getLongitude());
-			userLocation.setSpeed(location.getSpeed());
-			u.setLocation(userLocation);
+			
+			u.setAccuracy(location.getAccuracy());
+			u.setBearing(location.getBearing());
+			u.setLatitude(location.getLatitude());
+			u.setLongitude(location.getLongitude());
+			u.setSpeed(location.getSpeed());
+			
 			u.setMode("Still");
 			u.setRegisterId(GCMRegistrar.getRegistrationId(getApplicationContext()));
 			u.setStreetName("Pearse Street");

@@ -12,10 +12,11 @@
         android:layout_marginLeft="79dp"
         android:layout_marginTop="31dp"
         android:text="Task"
+        android:textColor="@color/blue"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/showPic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -34,16 +35,6 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_below="@+id/textView2"
-        android:layout_marginTop="58dp"
-        android:text="Please leave your reply here:"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
         android:id="@+id/task_des"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,15 +43,6 @@
         android:layout_marginTop="21dp"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_below="@+id/textView3"
-        android:layout_marginTop="14dp"
-        android:ems="10" />
 
     <TextView
         android:id="@+id/textView4"
@@ -73,7 +55,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/addPic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView4"
@@ -88,5 +70,25 @@
         android:layout_below="@+id/imageView2"
         android:src="@drawable/accept"
         android:visibility="invisible" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_centerVertical="true"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/editText1"
+        android:layout_centerHorizontal="true"
+        android:text="Please leave your reply here:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

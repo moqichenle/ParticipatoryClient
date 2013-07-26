@@ -6,7 +6,6 @@ import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.ReportFromApp;
 import ie.tcd.scss.dsg.po.User;
-import ie.tcd.scss.dsg.po.UserLocation;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Timer;
@@ -145,7 +144,6 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				imageView.setVisibility(View.VISIBLE);
 
 				int bytes = photo.getByteCount();
-				System.out.println("@@@@@@@@bytes=" + bytes);
 				ByteArrayOutputStream array = new ByteArrayOutputStream(bytes);
 				photo.compress(Bitmap.CompressFormat.PNG, 100, array);
 				report.setAttachment(array.toByteArray());
@@ -175,13 +173,11 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				buildAlertMessageNoLocation();
 			}
 
-			UserLocation currLocation = new UserLocation();
-			currLocation.setAccuracy(local.getAccuracy());
-			currLocation.setBearing(local.getBearing());
-			currLocation.setLatitude(local.getLatitude());
-			currLocation.setLongitude(local.getLongitude());
-			currLocation.setSpeed(local.getSpeed());
-			currentUser.setLocation(currLocation);
+			currentUser.setAccuracy(local.getAccuracy());
+			currentUser.setBearing(local.getBearing());
+			currentUser.setLatitude(local.getLatitude());
+			currentUser.setLongitude(local.getLongitude());
+			currentUser.setSpeed(local.getSpeed());
 
 			report.setCategoryId(categoryId);
 			report.setContend(contend);
@@ -193,7 +189,6 @@ public class AddReportActivity extends SlidingFragmentActivity {
 			currentUser.setAverWalkSpeed(0);
 			currentUser.setMode("Walking");
 
-			// TODO streetsname using formatted_address
 			currentUser.setStreetName(formatted_address);
 			currentUser.setUserId(Long.valueOf(context.getUserId()));
 			report.setUser(currentUser);

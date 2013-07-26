@@ -108,6 +108,7 @@
         android:layout_marginTop="31dp"
         android:layout_toRightOf="@+id/textView8"
         android:text="Report"
+        android:textColor="@color/blue"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ImageView

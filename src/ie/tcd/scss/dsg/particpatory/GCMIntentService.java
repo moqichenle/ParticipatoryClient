@@ -2,7 +2,7 @@ package ie.tcd.scss.dsg.particpatory;
 
 import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.Deviceinfoendpoint;
 import ie.tcd.scss.dsg.particpatory.deviceinfoendpoint.model.DeviceInfo;
-import ie.tcd.scss.dsg.particpatory.task.TaskDetailActivity;
+import ie.tcd.scss.dsg.particpatory.task.NewTaskActivity;
 import ie.tcd.scss.dsg.particpatory.user.UserProfile;
 import ie.tcd.scss.dsg.particpatory.user.UserRegister;
 
@@ -130,20 +130,24 @@ public class GCMIntentService extends GCMBaseIntentService {
 		// Toast.LENGTH_LONG).show();
 		// }
 		// });
+		String message = intent.getStringExtra("message");
+		Log.d(TAG, "receive message from server=" + message);
+		AppContext appContext = (AppContext) getApplicationContext();
+		appContext.setTaskInfo(message);
+		SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME,
+				MODE_PRIVATE);
+		Editor editor = shared.edit();
+		int amount  = appContext.getTaskingAmount();
+		editor.putInt("overall", amount+1);
+		editor.commit();
 		Bitmap bm = BitmapFactory.decodeResource(getResources(),
 				R.drawable.task);
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				this).setLargeIcon(bm).setSmallIcon(R.drawable.task)
-				.setContentTitle("A New Task!")
+				.setContentTitle("A New Task!").setContentText(message.subSequence(0, 10))
 				.setWhen(System.currentTimeMillis()).setAutoCancel(true);
-		String message = intent.getStringExtra("message");
 		
-		SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
-		//save into sharedPreference
-		Editor editor = shared.edit();
-		editor.putString("taskInfo", message);
-		editor.commit();
-		Intent resultIntent = new Intent(this, TaskDetailActivity.class);
+		Intent resultIntent = new Intent(this, NewTaskActivity.class);
 
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 		stackBuilder.addParentStack(UserProfile.class);
@@ -152,7 +156,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		mBuilder.setContentIntent(resultPendingIntent);
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		int mId = 1;//what s this?
+		int mId = 1;// what s this?
 		// mId allows you to update the notification later on.
 		mNotificationManager.notify(mId, mBuilder.build());
 
