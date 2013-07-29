@@ -3,7 +3,6 @@ package ie.tcd.scss.dsg.particpatory.task;
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
-import ie.tcd.scss.dsg.particpatory.query.QueryActivity;
 import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.particpatory.util.LocationUtil;
@@ -45,7 +44,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public class NewTaskActivity extends SlidingFragmentActivity {
-	private static final String TAG = "AddReportActivity";
+	private static final String TAG = "NewTaskActivity";
 	private AppContext context;
 	private ListFragment mFrag;
 	private String taskId;
@@ -56,8 +55,8 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 	private String formatted_address;
 	private User currentUser = new User();
 	private int acceptedNumber;
-	private SharedPreferences shared = getSharedPreferences(
-			AppContext.PREFS_NAME, MODE_PRIVATE);
+	private SharedPreferences shared;
+	private TextView description;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -65,14 +64,23 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 		context = (AppContext) getApplicationContext();
 		setContentView(R.layout.activity_show_task);
 		setupSlidingMenu(savedInstanceState);
+		shared = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
+		
 		String taskInfo = context.getTaskInfo();
+		description = (TextView) findViewById(R.id.task_desc);
+		
 		// taskInfo = description+expirePeriod+taskId(sub)
-		String[] subMsg = taskInfo.split("_");
-		TextView description = (TextView) findViewById(R.id.task_des);
-		description.setText(subMsg[0]);
-		// int expireTime = Integer.valueOf(subMsg[1]);
-		// String assignId = subMsg[3];
-		taskId = subMsg[2];
+		if (context.getTaskdescription() != null) {
+			taskId = context.getTaskId();
+			description.setText(context.getTaskdescription());
+		} else {
+			String[] subMsg = taskInfo.split("_");
+			description.setText(subMsg[0]);
+			// int expireTime = Integer.valueOf(subMsg[1]);
+			// String assignId = subMsg[3];
+			taskId = subMsg[2];
+		}
+
 		LocationResult locationResult = new LocationResult() {
 			@Override
 			public void gotLocation(Location location) {
@@ -90,12 +98,13 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 				}
 			}
 		};
+		
 		LocationUtil updatedLocation = new LocationUtil();
 		updatedLocation.getLocation(this, locationResult);
-		userInput = (EditText) findViewById(R.id.editText1);
+		userInput = (EditText) findViewById(R.id.input);
 		ImageView addPicture = (ImageView) findViewById(R.id.addPic);
 		addPicture.setOnClickListener(this.addNewPictureListener);
-		imageView = (ImageView) findViewById(R.id.showpics);
+		imageView = (ImageView) findViewById(R.id.showImg);
 	}
 
 	private OnClickListener addNewPictureListener = new OnClickListener() {
@@ -117,6 +126,7 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 				Bitmap photo = (Bitmap) imageReturnedIntent.getExtras().get(
 						"data");
 				photo = Bitmap.createBitmap(photo);
+				Log.d(TAG, "photo="+photo);
 				imageView.setImageBitmap(photo);
 				imageView.setVisibility(View.VISIBLE);
 
@@ -148,7 +158,6 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 			currentUser.setLatitude(local.getLatitude());
 			currentUser.setLongitude(local.getLongitude());
 			currentUser.setSpeed(local.getSpeed());
-			
 
 			boolean flag = false;
 			flag = submitTask(task);
@@ -235,7 +244,7 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				Log.d(TAG, "request successfully");
 				Intent newIntent = new Intent(getApplicationContext(),
-						QueryActivity.class);
+						TaskActivity.class);
 				startActivity(newIntent);
 			} else {
 				Log.d(TAG, "failed");
@@ -245,6 +254,7 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 		}
 	}
 
+	
 	private void setupSlidingMenu(Bundle savedInstanceState) {
 
 		setBehindContentView(R.layout.menu_frame);

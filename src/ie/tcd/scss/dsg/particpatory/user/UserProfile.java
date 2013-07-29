@@ -12,8 +12,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
@@ -72,6 +70,7 @@ public class UserProfile extends SlidingFragmentActivity implements
 		TextView userName = (TextView) findViewById(R.id.userName);
 		userName.setText(nickName);
 		mode = (TextView) findViewById(R.id.mode);
+		mode.setText(context.getMode());
 		TextView walk = (TextView) findViewById(R.id.walk);
 		TextView cycle = (TextView) findViewById(R.id.cycle);
 		TextView drive = (TextView) findViewById(R.id.drive);
@@ -91,10 +90,6 @@ public class UserProfile extends SlidingFragmentActivity implements
 					.getStringExtra(ActivityRecognitionIntentService.RECOGNITION_RESULT);
 			mode.setText(result);
 			context.setMode(result);
-			SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
-			Editor editor = shared.edit();
-			editor.putString("mode", result);
-			editor.commit();
 		}
 	};
 

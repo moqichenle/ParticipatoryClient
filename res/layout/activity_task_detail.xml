@@ -12,8 +12,8 @@
         android:layout_marginLeft="79dp"
         android:layout_marginTop="31dp"
         android:text="Task"
-        android:textColor="@color/blue"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/blue" />
 
     <ImageView
         android:id="@+id/showPic"
@@ -51,19 +51,18 @@
         android:layout_alignLeft="@+id/task_desc"
         android:layout_below="@+id/task_desc"
         android:layout_marginTop="20dp"
-        android:text="Please leave your reply here:"
+        android:text="Reply:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
+    <TextView
         android:id="@+id/input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView3"
         android:layout_below="@+id/textView3"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
+         android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" >
+    </TextView>
 
     <TextView
         android:id="@+id/textView4"
@@ -72,7 +71,7 @@
         android:layout_alignLeft="@+id/input"
         android:layout_below="@+id/input"
         android:layout_marginTop="20dp"
-        android:text="Take a picture as a reply:"
+        android:text="The Picture:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
@@ -80,16 +79,8 @@
         android:layout_width="180sp"
         android:layout_height="160sp"
         android:layout_alignLeft="@+id/textView4"
-        android:layout_below="@+id/addPic"
+        android:layout_alignTop="@+id/textView4"
         android:src="@drawable/accept"
         android:visibility="invisible" />
-
-    <ImageView
-        android:id="@+id/addPic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView4"
-        android:layout_toRightOf="@+id/textView4"
-        android:src="@drawable/add" />
 
 </RelativeLayout>

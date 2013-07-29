@@ -2,7 +2,6 @@ package ie.tcd.scss.dsg.particpatory.query;
 
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
-import ie.tcd.scss.dsg.particpatory.user.UserProfile;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.ResultsToQuery;
 
@@ -79,9 +78,11 @@ public class QueryResultActivity extends Activity {
 			@Override
 			public boolean onMarkerClick(Marker m) {
 				String key = m.getId();
+				Log.d(TAG, "----------------->" + key);
 				if (ids.containsKey(m.getId())) {
 					Log.d(TAG,
-							"contain key..with picture" + m.isInfoWindowShown());
+							"contain key..with picture/" + key + "/"
+									+ m.getSnippet());
 					customContent(m.getTitle(), m.getSnippet(), ids.get(key));
 					m.showInfoWindow();
 				} else {
@@ -90,13 +91,11 @@ public class QueryResultActivity extends Activity {
 
 						@Override
 						public View getInfoWindow(Marker arg0) {
-							// TODO Auto-generated method stub
 							return null;
 						}
 
 						@Override
 						public View getInfoContents(Marker arg0) {
-							// TODO Auto-generated method stub
 							return null;
 						}
 					});
@@ -200,7 +199,6 @@ public class QueryResultActivity extends Activity {
 										.getLongitude()))
 						.title(Constant.getCategoryName(r[i].getCategoryId()))
 						.snippet(r[i].getContent()));
-				Log.d(TAG, "idm" + i + "/content=" + r[i].getContent());
 				ids.put(m.getId(), attach);
 			} else if (r[i].getReportId() != null
 					&& r[i].getResultImage() == null) {
@@ -214,10 +212,27 @@ public class QueryResultActivity extends Activity {
 					&& r[i].getResultImage() != null) {
 				// image
 				byte[] attach = r[i].getResultImage();
-				mMap.addMarker(new MarkerOptions().position(
-						new LatLng(r[i].getLatitude(), r[i].getLongitude()))
-						.title(Constant.getCategoryName(r[i].getCategoryId())));
-				ids.put("idm" + i, attach);
+
+				if (r[i].getTaskComment() != null) {
+					Marker m = mMap.addMarker(new MarkerOptions()
+							.position(
+									new LatLng(r[i].getLatitude(), r[i]
+											.getLongitude()))
+							.title(Constant.getCategoryName(r[i]
+									.getCategoryId()))
+							.snippet(r[i].getTaskComment()));
+					ids.put(m.getId(), attach);
+				} else {
+					Marker m = mMap.addMarker(new MarkerOptions()
+							.position(
+									new LatLng(r[i].getLatitude(), r[i]
+											.getLongitude()))
+							.title(Constant.getCategoryName(r[i]
+									.getCategoryId()))
+							.snippet("no specific comment"));
+					ids.put(m.getId(), attach);
+				}
+
 			} else if (r[i].getTaskId() != null
 					&& r[i].getResultImage() == null) {
 				// normal questioned tasks
@@ -249,10 +264,8 @@ public class QueryResultActivity extends Activity {
 				View v = getLayoutInflater().inflate(
 						R.layout.activity_map_content, null);
 
-				// Getting reference to the TextView to set latitude
 				TextView title = (TextView) v.findViewById(R.id.mc_1);
 
-				// Getting reference to the TextView to set longitude
 				TextView content = (TextView) v.findViewById(R.id.mc_2);
 
 				title.setText(titles + "");

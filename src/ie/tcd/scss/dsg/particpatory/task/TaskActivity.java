@@ -147,6 +147,7 @@ public class TaskActivity extends SlidingFragmentActivity {
 							} else {
 								values[i] = tasks[i].getTaskId() + "_"
 										+ tasks[i].getDescription() + "(X)";
+								context.setTaskdescription(tasks[i].getDescription());
 							}
 						}
 

@@ -20,6 +20,8 @@ public class AppContext extends Application {
 	private String taskId;
 	private String queryId;
 	private String taskInfo;
+	private String taskdescription;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -159,6 +161,14 @@ public class AppContext extends Application {
 
 	public void setTaskInfo(String taskInfo) {
 		this.taskInfo = taskInfo;
+	}
+
+	public String getTaskdescription() {
+		return taskdescription;
+	}
+
+	public void setTaskdescription(String taskdescription) {
+		this.taskdescription = taskdescription;
 	}
 
 }
