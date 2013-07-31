@@ -2,6 +2,7 @@ package ie.tcd.scss.dsg.particpatory;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.location.Location;
 
 public class AppContext extends Application {
 	public static final String PREFS_NAME = "MyPrefsFile";
@@ -21,7 +22,8 @@ public class AppContext extends Application {
 	private String queryId;
 	private String taskInfo;
 	private String taskdescription;
-	
+	private Location location;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -169,6 +171,14 @@ public class AppContext extends Application {
 
 	public void setTaskdescription(String taskdescription) {
 		this.taskdescription = taskdescription;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 }

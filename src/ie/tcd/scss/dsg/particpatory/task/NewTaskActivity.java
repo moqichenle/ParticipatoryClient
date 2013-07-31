@@ -18,8 +18,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -87,15 +85,8 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 				// Got the location!
 				Log.d(TAG, "get location:" + location);
 				local = location;
-				JSONObject ret = Constant.getLocationInfo(local.getLatitude(),
+				formatted_address = Constant.getLocationInfo(local.getLatitude(),
 						local.getLongitude());
-				JSONObject address;
-				try {
-					address = ret.getJSONArray("results").getJSONObject(0);
-					formatted_address = address.getString("formatted_address");
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
 			}
 		};
 		
@@ -194,6 +185,7 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 		if (overallNumber != 0) {
 			acceptance = Calculation.acceptance(acceptedNumber, overallNumber);
 		}
+		currentUser.setAcceptPercent(acceptance);
 		Editor editor = shared.edit();
 		editor.putFloat("accept", acceptance);
 		editor.putFloat("cycle", cycleSpeed);

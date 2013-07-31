@@ -149,16 +149,9 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				finding.setImageResource(R.drawable.accept);
 				Log.d(TAG, "get location good enough");
 				TextView textView = (TextView) findViewById(R.id.textView1);
-				JSONObject ret = Constant.getLocationInfo(local.getLatitude(),
-						local.getLongitude());
-				JSONObject address;
-				try {
-					address = ret.getJSONArray("results").getJSONObject(0);
-					formatted_address = address.getString("formatted_address");
-					textView.setText(formatted_address);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				formatted_address = Constant.getLocationInfo(
+						local.getLatitude(), local.getLongitude());
+				textView.setText(formatted_address);
 				locationManager.removeUpdates(locationListener);
 			}
 		}
@@ -223,12 +216,14 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 							+ Constant.getCategoryName(categoryId) + "at "
 							+ location_of_interest.getText().toString();
 					newQuery.setContent(content);
-					getLocationFromStreetName(location_of_interest.getText().toString().replaceAll(" ", ""));
-//					getLocationFromStreetName("42PearseStreetDublinIreland");
+					getLocationFromStreetName(location_of_interest.getText()
+							.toString().replaceAll(" ", ""));
+					// getLocationFromStreetName("42PearseStreetDublinIreland");
 					newQuery.setLatitude(lat);
 					newQuery.setLongitude(lon);
 					newQuery.setQueryTime(System.currentTimeMillis());
-					newQuery.setStreetName(location_of_interest.getText().toString());
+					newQuery.setStreetName(location_of_interest.getText()
+							.toString());
 					newQuery.setUserId(Long.valueOf(context.getUserId()));
 					boolean flag = submitQuery(newQuery);
 					User currentUser = new User();
@@ -239,16 +234,15 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					currentUser.setLongitude(local.getLongitude());
 					currentUser.setSpeed(local.getSpeed());
 
-					
 					// TODO average speed and mode.
-//					currentUser.setAcceptPercent(context.getAcceptPercent());
-//					currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
-//					currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
-//					currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
-//					currentUser.setMode(context.getMode());
-//					currentUser.setStreetName(formatted_address);
-//					currentUser.setUpdatedTime(System.currentTimeMillis());
-//					currentUser.setUserId(Long.valueOf(context.getUserId()));
+					// currentUser.setAcceptPercent(context.getAcceptPercent());
+					// currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
+					// currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
+					// currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+					// currentUser.setMode(context.getMode());
+					// currentUser.setStreetName(formatted_address);
+					// currentUser.setUpdatedTime(System.currentTimeMillis());
+					// currentUser.setUserId(Long.valueOf(context.getUserId()));
 					currentUser.setAcceptPercent(0);
 					currentUser.setAverCycleSpeed(0);
 					currentUser.setAverDriveSpeed(0);
@@ -337,12 +331,13 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 			while ((b = stream.read()) != -1) {
 				stringBuilder.append((char) b);
 			}
-			
+
 			JSONObject jsonObject = new JSONObject(stringBuilder.toString());
 			JSONObject convert = new JSONObject();
 			convert = jsonObject.getJSONArray("results").getJSONObject(0);
-			convert = convert.getJSONObject("geometry").getJSONObject("location");
-			
+			convert = convert.getJSONObject("geometry").getJSONObject(
+					"location");
+
 			lat = Double.valueOf(convert.getDouble("lat"));
 			lon = Double.valueOf(convert.getDouble("lng"));
 		} catch (Exception e) {
@@ -443,8 +438,9 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 		final AlertDialog alert = builder.create();
 		alert.show();
 	}
-	
-	private class AutoCompleteTask extends AsyncTask<String, Void, HttpResponse> {
+
+	private class AutoCompleteTask extends
+			AsyncTask<String, Void, HttpResponse> {
 		@Override
 		protected HttpResponse doInBackground(String... urls) {
 			String street = urls[0];
@@ -483,12 +479,13 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 						Log.d(TAG, addresses[i]);
 					}
 					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-							context, android.R.layout.simple_list_item_1, addresses);
+							context, android.R.layout.simple_list_item_1,
+							addresses);
 					location_of_interest.setAdapter(adapter);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 			}
 		}
 	}

@@ -3,13 +3,12 @@ package ie.tcd.scss.dsg.particpatory.report;
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
+import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.ReportFromApp;
 import ie.tcd.scss.dsg.po.User;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -17,17 +16,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTransaction;
@@ -56,9 +52,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 	private byte categoryId = 0;
 	private ArrayAdapter<CharSequence> keywordsAdapter;
 	private Location local;
-	private LocationManager locationManager;
 	private ImageView finding;
-	private Timer timer;
 	private String contend;
 	private ImageView attach;
 	private ImageView imageView;
@@ -66,19 +60,14 @@ public class AddReportActivity extends SlidingFragmentActivity {
 	private User currentUser = new User();
 	private ReportFromApp report = new ReportFromApp();
 	private boolean hasPhoto = false;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = (AppContext) getApplicationContext();
 		setContentView(R.layout.activity_add_report);
 		setupSlidingMenu(savedInstanceState);
-		// positioning
-		locationManager = (LocationManager) this
-				.getSystemService(Context.LOCATION_SERVICE);
-		// GPS_PROVIDER
-		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			buildAlertMessageNoGps();
-		}
+		
 		Log.d(TAG, "loaded");
 		Spinner category = (Spinner) findViewById(R.id.category);
 		ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter
@@ -100,20 +89,16 @@ public class AddReportActivity extends SlidingFragmentActivity {
 
 		finding = (ImageView) findViewById(R.id.locationIcon);
 
-		Log.d(TAG, "try to get last known location from GPS");
-		local = locationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-		if (local == null) {
-			Log.d(TAG,
-					"NO last known location from GPS,try to get from network");
-			local = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		local = context.getLocation();
+		Log.d(TAG, "get location already?" + context.getLocation());
+		if (local != null && local.hasAccuracy() && local.getAccuracy() <= 50) {
+			finding.setImageResource(R.drawable.accept);
+			TextView toShowLocation = (TextView) findViewById(R.id.textView1);
+			formatted_address = Constant.getLocationInfo(local.getLatitude(),
+					local.getLongitude());
+			toShowLocation.setText(formatted_address);
 		}
-
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				500, 5, locationListener);
-		startTimer();
+		
 
 		attach = (ImageView) findViewById(R.id.addAttachment);
 		attach.setOnClickListener(this.addAttachment);
@@ -169,111 +154,83 @@ public class AddReportActivity extends SlidingFragmentActivity {
 					&& local.getAccuracy() <= 50) {
 				finding.setImageResource(R.drawable.accept);
 				Log.d(TAG, "" + local.getAccuracy() + "*" + local.getLatitude());
+
+				currentUser.setAccuracy(local.getAccuracy());
+				currentUser.setBearing(local.getBearing());
+				currentUser.setLatitude(local.getLatitude());
+				currentUser.setLongitude(local.getLongitude());
+				currentUser.setSpeed(local.getSpeed());
+
+				report.setCategoryId(categoryId);
+				report.setContend(contend);
+				report.setUserId(Long.valueOf(context.getUserId()));
+				report.setStreetName(formatted_address);
+				calculateAverage();
+				currentUser.setAcceptPercent(context.getAcceptPercent());
+				currentUser.setMode(context.getMode());
+				currentUser.setStreetName(formatted_address);
+				currentUser.setUserId(Long.valueOf(context.getUserId()));
+				report.setUser(currentUser);
+				if (!hasPhoto) {
+					report.setAttachment(null);
+				}
+				Constant.setupConnectin();
+				Log.d(TAG, "set url");
+				String url = Constant.url + "/newreport";
+				HttpPost request = new HttpPost(url);
+				Gson gson = new Gson();
+				String json = gson.toJson(report);
+				StringEntity entity;
+				try {
+					entity = new StringEntity(json, "UTF-8");
+					entity.setContentType("application/json");
+					request.setEntity(entity);
+					HttpClient httpClient = new DefaultHttpClient();
+					HttpResponse response = httpClient.execute(request);
+					if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+						Log.d(TAG, "request successfully");
+						Intent newIntent = new Intent(getApplicationContext(),
+								ReportActivity.class);
+						startActivity(newIntent);
+					} else {
+						Log.d(TAG, "failed");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} else {
 				buildAlertMessageNoLocation();
-			}
-
-			currentUser.setAccuracy(local.getAccuracy());
-			currentUser.setBearing(local.getBearing());
-			currentUser.setLatitude(local.getLatitude());
-			currentUser.setLongitude(local.getLongitude());
-			currentUser.setSpeed(local.getSpeed());
-
-			report.setCategoryId(categoryId);
-			report.setContend(contend);
-			report.setUserId(Long.valueOf(context.getUserId()));
-			report.setStreetName(formatted_address);
-			// TODO value below need to be changed
-			currentUser.setAverCycleSpeed(0);
-			currentUser.setAverDriveSpeed(0);
-			currentUser.setAverWalkSpeed(0);
-			currentUser.setMode("Walking");
-
-			currentUser.setStreetName(formatted_address);
-			currentUser.setUserId(Long.valueOf(context.getUserId()));
-			report.setUser(currentUser);
-			if(!hasPhoto){
-				report.setAttachment(null);
-			}
-			Constant.setupConnectin();
-			Log.d(TAG, "set url");
-			String url = Constant.url + "/newreport";
-			HttpPost request = new HttpPost(url);
-			Gson gson = new Gson();
-			String json = gson.toJson(report);
-			StringEntity entity;
-			try {
-				entity = new StringEntity(json, "UTF-8");
-				entity.setContentType("application/json");
-				request.setEntity(entity);
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpResponse response = httpClient.execute(request);
-				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-					Log.d(TAG, "request successfully");
-					Intent newIntent = new Intent(getApplicationContext(),
-							ReportActivity.class);
-					startActivity(newIntent);
-				} else {
-					Log.d(TAG, "failed");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			break;
 		}
 		return true;
 	}
 
-	private void startTimer() {
-		this.timer = new Timer();
-		Log.d(TAG, "timer starts.");
-		this.timer.schedule(new TimeTask(), 10000, 10000);
+	
+	private void calculateAverage() {
+		SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME,
+				MODE_PRIVATE);
+		float newSpeed = local.getSpeed();
+		float walkSpeed = context.getAverWalkSpeed();
+		float cycleSpeed = context.getAverCycleSpeed();
+		float driveSpeed = context.getAverDriveSpeed();
+		if (context.getMode().equals("on_foot")) {
+			walkSpeed = Calculation.averageWalkSpeed(walkSpeed, newSpeed);
+			currentUser.setAverWalkSpeed(walkSpeed);
+		} else if (context.getMode().equals("on_bicycle")) {
+			cycleSpeed = Calculation.averageCycleSpeed(cycleSpeed, newSpeed);
+			currentUser.setAverCycleSpeed(cycleSpeed);
+		} else if (context.getMode().equals("in_vehicle")) {
+			driveSpeed = Calculation.averageDriveSpeed(driveSpeed, newSpeed);
+			currentUser.setAverDriveSpeed(driveSpeed);
+		}
+
+		Editor editor = shared.edit();
+		editor.putFloat("cycle", cycleSpeed);
+		editor.putFloat("drive", driveSpeed);
+		editor.putFloat("walk", walkSpeed);
+		editor.commit();
 	}
-
-	class TimeTask extends TimerTask {
-		@Override
-		public void run() {
-			Log.d(TAG, "load network provider");
-			local = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
-			timer.cancel();
-			timer.purge();
-		}
-	}
-
-	private LocationListener locationListener = new LocationListener() {
-		public void onLocationChanged(Location location) {
-			Log.d(TAG, "get new location updated");
-			local = location;
-			if (local != null && local.hasAccuracy()
-					&& local.getAccuracy() <= 50) {
-				finding.setImageResource(R.drawable.accept);
-				Log.d(TAG, "get location good enough");
-				TextView textView = (TextView) findViewById(R.id.textView1);
-				JSONObject ret = Constant.getLocationInfo(local.getLatitude(),
-						local.getLongitude());
-				JSONObject address;
-				try {
-					address = ret.getJSONArray("results").getJSONObject(0);
-					formatted_address = address.getString("formatted_address");
-					textView.setText(formatted_address);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-
-		public void onProviderEnabled(String provider) {
-		}
-
-		public void onProviderDisabled(String provider) {
-		}
-	};
 
 	private OnItemSelectedListener selectCategory = new OnItemSelectedListener() {
 
@@ -343,12 +300,6 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		// getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		locationManager.removeUpdates(locationListener);
-
-	}
 
 	/**
 	 * didnt get good enough location
@@ -368,29 +319,4 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		alert.show();
 	}
 
-	/**
-	 * to check if the GPS is open
-	 */
-	private void buildAlertMessageNoGps() {
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(
-				"Your GPS seems to be disabled, do you want to enable it?")
-				.setCancelable(false)
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							public void onClick(final DialogInterface dialog,
-									final int id) {
-								startActivity(new Intent(
-										android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-							}
-						})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						dialog.cancel();
-					}
-				});
-		final AlertDialog alert = builder.create();
-		alert.show();
-	}
 }

@@ -98,7 +98,6 @@ public class TaskDetailActivity extends SlidingFragmentActivity {
 					task = gson.fromJson(results, TaskModel.class);
 					description.setText(task.getDescription());
 					userInput.setText(task.getComment());
-					userInput.setEnabled(false);
 					if(task.getPicture()!=null){
 						byte[] attach = task.getPicture();
 						BitmapFactory.Options options = new BitmapFactory.Options();

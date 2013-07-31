@@ -52,7 +52,7 @@ public class ReportActivity extends SlidingFragmentActivity {
 		context = (AppContext) getApplicationContext();
 		setContentView(R.layout.activity_report);
 		setupSlidingMenu(savedInstanceState);
-		Log.d(TAG, "loaded");
+		Log.d(TAG, "loaded and current mode is:"+context.getMode());
 		listView = (ListView) findViewById(R.id.reportlist);
 		listView.setOnItemClickListener(this.listViewListener);
 		Constant.setupConnectin();
@@ -67,9 +67,6 @@ public class ReportActivity extends SlidingFragmentActivity {
 			String[] split = itemValue.split("_");
 			String reportId = split[0];
 			context.setReportId(reportId);
-//			Toast.makeText(getApplicationContext(),
-//					"Position :" + pos + "  reportId : " + reportId,
-//					Toast.LENGTH_LONG).show();
 			Intent certainReport = new Intent(context, ReportDetailActivity.class);
 			startActivity(certainReport);
 		}
