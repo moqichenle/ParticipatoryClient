@@ -3,13 +3,12 @@ package ie.tcd.scss.dsg.particpatory.query;
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
+import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.Query;
 import ie.tcd.scss.dsg.po.User;
 
 import java.io.InputStream;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,16 +19,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -59,14 +56,13 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 	private AppContext context;
 	private ListFragment mFrag;
 	private Location local;
-	private LocationManager locationManager;
-	private Timer timer;
 	private String formatted_address;
 	private byte categoryId = 0;
 	private ImageView finding;
 	private AutoCompleteTextView location_of_interest;
 	private double lat;
 	private double lon;
+	private User currentUser;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -85,44 +81,25 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 
 		category.setOnItemSelectedListener(this.selectCategory);
 
-		// positioning
-		locationManager = (LocationManager) this
-				.getSystemService(Context.LOCATION_SERVICE);
-		Log.d(TAG, "try to get last known location from GPS");
-		local = locationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-		if (local == null) {
-			Log.d(TAG,
-					"NO last known location from GPS,try to get from network");
-			local = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		}
-		// GPS_PROVIDER
-		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			buildAlertMessageNoGps();
-		}
-
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				500, 5, locationListener);
-		startTimer();
-
+		local = context.getLocation();
 		finding = (ImageView) findViewById(R.id.query_locationing);
+		TextView textView = (TextView) findViewById(R.id.textView1);
+		formatted_address = Constant.getLocationInfo(local.getLatitude(),
+				local.getLongitude());
+		textView.setText(formatted_address);
+		if(local.hasAccuracy()&&local.getAccuracy()<=50){
+			finding.setImageResource(R.drawable.accept);
+		}
 		location_of_interest = (AutoCompleteTextView) findViewById(R.id.query_location_input);
-
 		location_of_interest.addTextChangedListener(this.searchLocation);
-		location_of_interest.setThreshold(3);
+		// location_of_interest.setThreshold(3);
+		Constant.setupConnectin();
 	}
 
 	private TextWatcher searchLocation = new TextWatcher() {
 
 		@Override
 		public void afterTextChanged(Editable input) {
-			if (android.os.Build.VERSION.SDK_INT > 9) {
-				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-						.permitAll().build();
-				StrictMode.setThreadPolicy(policy);
-			}
 			String street = input.toString().replaceAll(" ", "");
 			new AutoCompleteTask().execute(street);
 		}
@@ -139,31 +116,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 
 		}
 
-	};
-	private LocationListener locationListener = new LocationListener() {
-		public void onLocationChanged(Location location) {
-			Log.d(TAG, "get new location updated");
-			local = location;
-			if (local != null && local.hasAccuracy()
-					&& local.getAccuracy() <= 50) {
-				finding.setImageResource(R.drawable.accept);
-				Log.d(TAG, "get location good enough");
-				TextView textView = (TextView) findViewById(R.id.textView1);
-				formatted_address = Constant.getLocationInfo(
-						local.getLatitude(), local.getLongitude());
-				textView.setText(formatted_address);
-				locationManager.removeUpdates(locationListener);
-			}
-		}
-
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-
-		public void onProviderEnabled(String provider) {
-		}
-
-		public void onProviderDisabled(String provider) {
-		}
 	};
 
 	private OnItemSelectedListener selectCategory = new OnItemSelectedListener() {
@@ -226,30 +178,18 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 							.toString());
 					newQuery.setUserId(Long.valueOf(context.getUserId()));
 					boolean flag = submitQuery(newQuery);
-					User currentUser = new User();
+					currentUser = new User();
 
 					currentUser.setAccuracy(local.getAccuracy());
 					currentUser.setBearing(local.getBearing());
 					currentUser.setLatitude(local.getLatitude());
 					currentUser.setLongitude(local.getLongitude());
 					currentUser.setSpeed(local.getSpeed());
-
-					// TODO average speed and mode.
-					// currentUser.setAcceptPercent(context.getAcceptPercent());
-					// currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
-					// currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
-					// currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
-					// currentUser.setMode(context.getMode());
-					// currentUser.setStreetName(formatted_address);
-					// currentUser.setUpdatedTime(System.currentTimeMillis());
-					// currentUser.setUserId(Long.valueOf(context.getUserId()));
-					currentUser.setAcceptPercent(0);
-					currentUser.setAverCycleSpeed(0);
-					currentUser.setAverDriveSpeed(0);
-					currentUser.setAverWalkSpeed(0);
+					calculateAverage();
+					currentUser.setAcceptPercent(context.getAcceptPercent());
 					currentUser.setMode(context.getMode());
 					currentUser.setStreetName(formatted_address);
-					currentUser.setUpdatedTime(System.currentTimeMillis());
+					currentUser.setStreetName(formatted_address);
 					currentUser.setUserId(Long.valueOf(context.getUserId()));
 					if (flag) {
 						updateUserContext(currentUser);
@@ -261,6 +201,35 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 			break;
 		}
 		return true;
+	}
+
+	private void calculateAverage() {
+		SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME,
+				MODE_PRIVATE);
+		float newSpeed = local.getSpeed();
+		float walkSpeed = context.getAverWalkSpeed();
+		float cycleSpeed = context.getAverCycleSpeed();
+		float driveSpeed = context.getAverDriveSpeed();
+		if (context.getMode().equals("on_foot")) {
+			walkSpeed = Calculation.averageWalkSpeed(walkSpeed, newSpeed);
+			currentUser.setAverWalkSpeed(walkSpeed);
+		} else if (context.getMode().equals("on_bicycle")) {
+			cycleSpeed = Calculation.averageCycleSpeed(cycleSpeed, newSpeed);
+			currentUser.setAverCycleSpeed(cycleSpeed);
+		} else if (context.getMode().equals("in_vehicle")) {
+			driveSpeed = Calculation.averageDriveSpeed(driveSpeed, newSpeed);
+			currentUser.setAverDriveSpeed(driveSpeed);
+		}else{
+			currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+			currentUser.setAverDriveSpeed( context.getAverDriveSpeed());
+			currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
+		}
+
+		Editor editor = shared.edit();
+		editor.putFloat("cycle", cycleSpeed);
+		editor.putFloat("drive", driveSpeed);
+		editor.putFloat("walk", walkSpeed);
+		editor.commit();
 	}
 
 	private boolean submitQuery(Query query) {
@@ -345,25 +314,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 		}
 	}
 
-	private void startTimer() {
-		this.timer = new Timer();
-		Log.d(TAG, "timer starts.");
-		this.timer.schedule(new TimeTask(), 10000, 10000);
-	}
-
-	class TimeTask extends TimerTask {
-		@Override
-		public void run() {
-			Log.d(TAG, "load network provider");
-			local = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 500, 5, locationListener);
-			timer.cancel();
-			timer.purge();
-		}
-	}
-
 	private void setupSlidingMenu(Bundle savedInstanceState) {
 
 		setBehindContentView(R.layout.menu_frame);
@@ -404,32 +354,6 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				"Your location is not good enough, please wait for several seconds.")
 				.setCancelable(false)
 				.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						dialog.cancel();
-					}
-				});
-		final AlertDialog alert = builder.create();
-		alert.show();
-	}
-
-	/**
-	 * to check if the GPS is open
-	 */
-	private void buildAlertMessageNoGps() {
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(
-				"Your GPS seems to be disabled, do you want to enable it?")
-				.setCancelable(false)
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							public void onClick(final DialogInterface dialog,
-									final int id) {
-								startActivity(new Intent(
-										android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-							}
-						})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(final DialogInterface dialog,
 							final int id) {
 						dialog.cancel();

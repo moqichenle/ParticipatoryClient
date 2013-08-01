@@ -223,6 +223,10 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		} else if (context.getMode().equals("in_vehicle")) {
 			driveSpeed = Calculation.averageDriveSpeed(driveSpeed, newSpeed);
 			currentUser.setAverDriveSpeed(driveSpeed);
+		}else{
+			currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+			currentUser.setAverDriveSpeed( context.getAverDriveSpeed());
+			currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
 		}
 
 		Editor editor = shared.edit();

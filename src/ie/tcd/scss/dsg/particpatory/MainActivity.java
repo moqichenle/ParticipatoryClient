@@ -56,35 +56,37 @@ public class MainActivity extends Activity {
 		if (!flag) {
 			// didnt open GPS or network.
 			buildAlertMessageNoGps();
-		}
-		if (context.getNickName() == null) {
-			if (GCMRegistrar.getRegistrationId(this.getApplicationContext()) != "") {
-				Log.d(TAG, "user registered before");
-				String registerId = GCMRegistrar.getRegistrationId(this
-						.getApplicationContext());
-				context.setRegisteredId(registerId);
-				SharedPreferences shared = getSharedPreferences(
-						AppContext.PREFS_NAME, MODE_PRIVATE);
-				Editor edit = shared.edit();
-				edit.putString("registeredId", registerId);
-				edit.commit();
-				Log.d(TAG, "store the registeredId in the app");
-				Intent intent = new Intent(this, UserRegister.class);
-				startActivity(intent);
+		}else{
+			if (context.getNickName() == null) {
+				if (GCMRegistrar.getRegistrationId(this.getApplicationContext()) != "") {
+					Log.d(TAG, "user registered before");
+					String registerId = GCMRegistrar.getRegistrationId(this
+							.getApplicationContext());
+					context.setRegisteredId(registerId);
+					SharedPreferences shared = getSharedPreferences(
+							AppContext.PREFS_NAME, MODE_PRIVATE);
+					Editor edit = shared.edit();
+					edit.putString("registeredId", registerId);
+					edit.commit();
+					Log.d(TAG, "store the registeredId in the app");
+					Intent intent = new Intent(this, UserRegister.class);
+					startActivity(intent);
+				} else {
+					// Start up RegisterActivity right away
+					Intent intent = new Intent(this, Welcome.class);
+					startActivity(intent);
+					// Since this is just a wrapper to start the main activity,
+					// finish it after launching RegisterActivity
+				}
 			} else {
-				// Start up RegisterActivity right away
-				Intent intent = new Intent(this, Welcome.class);
+				Intent intent = new Intent(this, UserProfile.class);
 				startActivity(intent);
-				// Since this is just a wrapper to start the main activity,
-				// finish it after launching RegisterActivity
 			}
-		} else {
-			Intent intent = new Intent(this, UserProfile.class);
-			startActivity(intent);
+			// Intent intent = new Intent(this, RegisterActivity.class);
+			// startActivity(intent);
+			finish();
 		}
-		// Intent intent = new Intent(this, RegisterActivity.class);
-		// startActivity(intent);
-		finish();
+		
 
 	}
 

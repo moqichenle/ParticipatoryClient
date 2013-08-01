@@ -38,10 +38,10 @@ public class LocationUtil {
 			return false;
 
 		if (gps_enabled)
-			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
+			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 5,
 					locationListenerGps);
 		if (network_enabled)
-			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
+			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 5,
 					locationListenerNetwork);
 		timer1 = new Timer();
 		timer1.schedule(new GetLastLocation(), 20000);
@@ -51,9 +51,11 @@ public class LocationUtil {
 	LocationListener locationListenerGps = new LocationListener() {
 		public void onLocationChanged(Location location) {
 			timer1.cancel();
-			locationResult.gotLocation(location);
-			lm.removeUpdates(this);
-			lm.removeUpdates(locationListenerNetwork);
+			if (location.hasAccuracy() && location.getAccuracy() <= 50) {
+				locationResult.gotLocation(location);
+				lm.removeUpdates(this);
+				lm.removeUpdates(locationListenerNetwork);
+			}
 		}
 
 		public void onProviderDisabled(String provider) {
@@ -69,9 +71,11 @@ public class LocationUtil {
 	LocationListener locationListenerNetwork = new LocationListener() {
 		public void onLocationChanged(Location location) {
 			timer1.cancel();
-			locationResult.gotLocation(location);
-			lm.removeUpdates(this);
-			lm.removeUpdates(locationListenerGps);
+			if (location.hasAccuracy() && location.getAccuracy() <= 50) {
+				locationResult.gotLocation(location);
+				lm.removeUpdates(this);
+				lm.removeUpdates(locationListenerGps);
+			}
 		}
 
 		public void onProviderDisabled(String provider) {

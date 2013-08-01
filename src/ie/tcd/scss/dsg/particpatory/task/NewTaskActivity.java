@@ -179,6 +179,10 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 		} else if (context.getMode().equals("in_vehicle")) {
 			driveSpeed = Calculation.averageDriveSpeed(driveSpeed, newSpeed);
 			currentUser.setAverDriveSpeed(driveSpeed);
+		}else{
+			currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
+			currentUser.setAverDriveSpeed( context.getAverDriveSpeed());
+			currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
 		}
 		int overallNumber = shared.getInt("overall", 0);
 		float acceptance = 0.f;
