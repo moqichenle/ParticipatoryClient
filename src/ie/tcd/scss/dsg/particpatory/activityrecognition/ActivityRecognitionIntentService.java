@@ -16,9 +16,6 @@
 
 package ie.tcd.scss.dsg.particpatory.activityrecognition;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
@@ -46,8 +43,10 @@ public class ActivityRecognitionIntentService extends IntentService {
 
 	private SharedPreferences mPrefs;
 	public static final String RECOGNITION_RESULT = "result";
-	private Location local;
 	private AppContext context;
+	// private int activityDetectedTimes = 0;
+	private float newSpeed;
+	private String detectedMode;
 
 	public ActivityRecognitionIntentService() {
 		// Set the label for the service's background thread
@@ -64,90 +63,180 @@ public class ActivityRecognitionIntentService extends IntentService {
 		context = (AppContext) getApplicationContext();
 		// Get a handle to the repository
 		mPrefs = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
-		
-		// If the intent contains an update
 		if (ActivityRecognitionResult.hasResult(intent)) {
 
-			// Get the update
 			ActivityRecognitionResult result = ActivityRecognitionResult
 					.extractResult(intent);
-
-			// Get the most probable activity from the list of activities in the
-			// update
 			DetectedActivity mostProbableActivity = result
 					.getMostProbableActivity();
 
-			// Get the confidence percentage for the most probable activity
 			int confidence = mostProbableActivity.getConfidence();
-			// Get the type of activity
 			int activityType = mostProbableActivity.getType();
 			Log.d("ActivityRecognitionIntentService",
 					getNameFromType(activityType) + "***" + confidence);
-			if (confidence >= 60
-					&& !getNameFromType(activityType).equals("UNKNOWN")&&!getNameFromType(activityType).equals("unknown")) {
+			detectedMode = getNameFromType(activityType);
+
+			
+			if (confidence >= 50 && !detectedMode.equals("UNKNOWN")
+					&& !detectedMode.equals("unknown")) {
 				Editor editor = mPrefs.edit();
-				editor.putString("mode", getNameFromType(activityType));
+				if (context.getLocation() != null) {
+					// when the MainAcitvity detects current location.
 
-				if (!context.getMode().equals(getNameFromType(activityType))) {
-					Handler h = new Handler(Looper.getMainLooper());
-					h.post(new Runnable() {
-						@Override
-						public void run() {
-							LocationResult locationResult = new LocationResult() {
-								@Override
-								public void gotLocation(Location location) {
-									// Got the location!
-									local = location;
-									Log.d("ActivityRecognitionIntentService",
-											"location:" + location.getAccuracy() + "/"
-													+ location.getLatitude()+"/"+location.getLongitude());
-									context.setLocation(location);
+					/*
+					 * for test, assume the status is onfoot
+					 * context.setMode("on_foot"); detectedMode = "on_foot";
+					 */
+					if (!context.getMode().equals(detectedMode)) {
+						Log.d("ActivityRecognitionIntentService",
+								"update when mode changed*!!!!!!!!!!"
+										+ detectedMode);
+						// only update when mode changed
+						Handler h = new Handler(Looper.getMainLooper());
+						h.post(new Runnable() {
+							@Override
+							public void run() {
+								LocationResult locationResult = new LocationResult() {
+									@Override
+									public void gotLocation(Location location) {
+										Log.d("ActivityRecognitionIntentService",
+												"location:" + location);
+										context.setLocation(location);
+										newSpeed = location.getSpeed();
+										doCalculations(detectedMode);
+										Constant.updateUserInformation(
+												location, context);
+									}
+								};
+								LocationUtil updatedLocation = new LocationUtil();
+								boolean flag = updatedLocation
+										.getLocation(getApplicationContext(),
+												locationResult);
+								if (!flag) {
+									// didnt open GPS or network.
+									buildAlertMessageNoGps();
 								}
-							};
-
-							LocationUtil updatedLocation = new LocationUtil();
-							boolean flag = updatedLocation.getLocation(
-									getApplicationContext(), locationResult);
-							if (!flag) {
-								// didnt open GPS or network.
-								buildAlertMessageNoGps();
 							}
-						}
-					});
-					// only update when mode changed
-					float newSpeed = local.getSpeed();
-					float walkSpeed = context.getAverWalkSpeed();
-					float cycleSpeed = context.getAverCycleSpeed();
-					float driveSpeed = context.getAverDriveSpeed();
-					if (getNameFromType(activityType).equals("on_foot")) {
-						walkSpeed = Calculation.averageWalkSpeed(walkSpeed,
-								newSpeed);
-						context.setAverWalkSpeed(walkSpeed);
-					} else if (getNameFromType(activityType).equals(
-							"on_bicycle")) {
-						cycleSpeed = Calculation.averageCycleSpeed(cycleSpeed,
-								newSpeed);
-						context.setAverCycleSpeed(cycleSpeed);
-					} else if (getNameFromType(activityType).equals(
-							"in_vehicle")) {
-						driveSpeed = Calculation.averageDriveSpeed(driveSpeed,
-								newSpeed);
-						context.setAverDriveSpeed(driveSpeed);
-					}
-					editor.putFloat("cycle", cycleSpeed);
-					editor.putFloat("drive", driveSpeed);
-					editor.putFloat("walk", walkSpeed);
-					editor.commit();
-					Constant.updateUserInformation(local, context);
-				}
+						});
+						Constant.activityDetectedTimes = 0;
+					} else if (!context.getMode().equals("still")) {
+						// if the mode is not still, and didnt change for every
+						// mode
+						// checking. every 60 seconds.
+						Constant.activityDetectedTimes++;
+						Handler h = new Handler(Looper.getMainLooper());
+						h.post(new Runnable() {
+							@Override
+							public void run() {
+								LocationResult locationResult = new LocationResult() {
+									@Override
+									public void gotLocation(Location location) {
+										Log.d("ActivityRecognitionIntentService",
+												"location:" + location);
+										context.setLocation(location);
+										newSpeed = location.getSpeed();
+										if (context.getMode().equals("on_foot")) {
+											if (Constant.activityDetectedTimes == 15) {
+												// walking , every 15 mins.
+												doCalculations("on_foot");
+												Constant.updateUserInformation(
+														location, context);
+												Constant.activityDetectedTimes = 0;
+											}
+										} else if (context.getMode().equals(
+												"on_bicycle")) {
+											if (Constant.activityDetectedTimes == 10) {
+												// cycling , every 10 mins.
+												doCalculations("on_bicycle");
+												Constant.updateUserInformation(
+														location, context);
+												Constant.activityDetectedTimes = 0;
+											}
+										} else if (context.getMode().equals(
+												"in_vehicle")) {
+											if (Constant.activityDetectedTimes == 5) {
+												// driving , every 5 mins.
+												doCalculations("in_vehicle");
+												Constant.updateUserInformation(
+														location, context);
+												Constant.activityDetectedTimes = 0;
+											}
+										}
+									}
+								};
 
-				context.setMode(getNameFromType(activityType));
-				Intent i = new Intent("ie.tcd.scss.dsg.particpatory.UPDATE");
-				i.putExtra(RECOGNITION_RESULT, getNameFromType(activityType));
-				sendBroadcast(i);
+								LocationUtil updatedLocation = new LocationUtil();
+								boolean flag = updatedLocation
+										.getLocation(getApplicationContext(),
+												locationResult);
+								if (!flag) {
+									// didnt open GPS or network.
+									buildAlertMessageNoGps();
+								}
+							}
+						});
+					}
+
+					context.setMode(detectedMode);
+					Intent i = new Intent("ie.tcd.scss.dsg.particpatory.UPDATE");
+					i.putExtra(RECOGNITION_RESULT, detectedMode);
+					editor.putString("mode", detectedMode);
+					editor.commit();
+					editor.commit();
+					sendBroadcast(i);
+				}
 			}
 		}
 	}
+
+	private void doCalculations(String activity) {
+		Editor editor = mPrefs.edit();
+		// float newSpeed = local.getSpeed();
+		Log.d("caclulations::::::::::newSpeed", newSpeed + "");
+		float walkSpeed = context.getAverWalkSpeed();
+		float cycleSpeed = context.getAverCycleSpeed();
+		float driveSpeed = context.getAverDriveSpeed();
+		if (activity.equals("on_foot")) {
+			walkSpeed = Calculation.averageWalkSpeed(walkSpeed, newSpeed);
+			context.setAverWalkSpeed(walkSpeed);
+			editor.putFloat("walk", walkSpeed);
+			Log.d("doCalculations", "newWalkSpeed=" + walkSpeed);
+		} else if (activity.equals("on_bicycle")) {
+			cycleSpeed = Calculation.averageCycleSpeed(cycleSpeed, newSpeed);
+			context.setAverCycleSpeed(cycleSpeed);
+			editor.putFloat("cycle", cycleSpeed);
+		} else if (activity.equals("in_vehicle")) {
+			driveSpeed = Calculation.averageDriveSpeed(driveSpeed, newSpeed);
+			context.setAverDriveSpeed(driveSpeed);
+			editor.putFloat("drive", driveSpeed);
+		}
+		editor.commit();
+	}
+
+	// private void checkLocation() {
+	// Handler h = new Handler(Looper.getMainLooper());
+	// h.post(new Runnable() {
+	// @Override
+	// public void run() {
+	// LocationResult locationResult = new LocationResult() {
+	// @Override
+	// public void gotLocation(Location location) {
+	// Log.d("ActivityRecognitionIntentService", "location:"
+	// + location);
+	// context.setLocation(location);
+	// }
+	// };
+	//
+	// LocationUtil updatedLocation = new LocationUtil();
+	// boolean flag = updatedLocation.getLocation(
+	// getApplicationContext(), locationResult);
+	// if (!flag) {
+	// // didnt open GPS or network.
+	// buildAlertMessageNoGps();
+	// }
+	// }
+	// });
+	// }
 
 	/**
 	 * to check if the GPS is open

@@ -13,7 +13,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.location.Location;
@@ -24,6 +23,7 @@ import com.google.gson.Gson;
 public class Constant {
 	public static String url = "http://192.168.1.10:8888";// 10.6.33.177
 															// 192.168.1.10
+	public static int activityDetectedTimes = 0;
 
 	public static String getCategoryName(byte id) {
 		if (id == (byte) 0) {
@@ -45,10 +45,10 @@ public class Constant {
 	 * @return
 	 */
 	public static String getLocationInfo(double lat, double lng) {
-
+		setupConnectin();
 		HttpGet httpGet = new HttpGet(
-				"http://maps.google.com/maps/api/geocode/json?latlng=" + lat
-						+ "," + lng + "&sensor=true");
+				"http://maps.googleapis.com/maps/api/geocode/json?latlng="
+						+ lat + "," + lng + "&sensor=true");
 		HttpClient client = new DefaultHttpClient();
 		HttpResponse response;
 		StringBuilder stringBuilder = new StringBuilder();
@@ -61,17 +61,15 @@ public class Constant {
 			while ((b = stream.read()) != -1) {
 				stringBuilder.append((char) b);
 			}
-		} catch (Exception e) {
-		}
 
-		JSONObject jsonObject = new JSONObject();
-		try {
+			JSONObject jsonObject = new JSONObject();
 			jsonObject = new JSONObject(stringBuilder.toString());
 			JSONObject address;
 			address = jsonObject.getJSONArray("results").getJSONObject(0);
 			String formatted_address = address.getString("formatted_address");
+			System.out.println("get formatted_address!!!" + formatted_address);
 			return formatted_address;
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -86,6 +84,9 @@ public class Constant {
 	}
 
 	public static void updateUserInformation(Location local, AppContext context) {
+		Constant.setupConnectin();
+		System.out.println("++++++++++++++++++++++++++++" + local.getLatitude()
+				+ "/" + local.getLongitude());
 		User user = new User();
 		user.setUserId(Long.valueOf(context.getUserId()));
 		user.setAccuracy(local.getAccuracy());
@@ -98,7 +99,8 @@ public class Constant {
 		user.setAverDriveSpeed(context.getAverDriveSpeed());
 		user.setAverWalkSpeed(context.getAverWalkSpeed());
 		user.setMode(context.getMode());
-		user.setStreetName(getLocationInfo(local.getLatitude(),local.getLongitude()));
+		user.setStreetName(getLocationInfo(local.getLatitude(),
+				local.getLongitude()));
 		String url = Constant.url + "/updateuser";
 		HttpPost request = new HttpPost(url);
 		Gson gson = new Gson();

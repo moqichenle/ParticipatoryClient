@@ -30,7 +30,9 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 public class UserProfile extends SlidingFragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener {
 	public static final int MILLISECONDS_PER_SECOND = 1000;
-	public static final int DETECTION_INTERVAL_SECONDS = 20;
+	//every 60 seconds update.
+	public static final int DETECTION_INTERVAL_SECONDS = 60;
+	
 	public static final int DETECTION_INTERVAL_MILLISECONDS = MILLISECONDS_PER_SECOND
 			* DETECTION_INTERVAL_SECONDS;
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -79,7 +81,7 @@ public class UserProfile extends SlidingFragmentActivity implements
 		walk.setText(context.getAverWalkSpeed() + "");
 		cycle.setText(context.getAverCycleSpeed() + "");
 		drive.setText(context.getAverDriveSpeed() + "");
-		rate.setText(context.getAcceptPercent() + "");
+		rate.setText(context.getAcceptPercent()*100 + "%");
 	}
 
 	private BroadcastReceiver mUpdateReceiver = new BroadcastReceiver() {
@@ -89,7 +91,6 @@ public class UserProfile extends SlidingFragmentActivity implements
 			String result = intent
 					.getStringExtra(ActivityRecognitionIntentService.RECOGNITION_RESULT);
 			mode.setText(result);
-			context.setMode(result);
 		}
 	};
 

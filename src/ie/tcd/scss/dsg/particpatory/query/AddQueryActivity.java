@@ -128,8 +128,12 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				categoryId = -1;
 			} else if (category.equals("Traffic")) {
 				categoryId = 0;
-			} else {
+			} else if (category.equals("Impression")) {
 				categoryId = 1;
+			}else if (category.equals("Queue")){
+				categoryId = 2;
+			}else{
+				categoryId = -1;
 			}
 		}
 

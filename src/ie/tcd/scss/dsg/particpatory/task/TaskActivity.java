@@ -3,6 +3,7 @@ package ie.tcd.scss.dsg.particpatory.task;
 import ie.tcd.scss.dsg.particpatory.AppContext;
 import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
+import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
 import ie.tcd.scss.dsg.po.TaskModel;
 
@@ -22,6 +23,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -38,7 +41,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public class TaskActivity extends SlidingFragmentActivity {
-	private static final String TAG = "ReportActivity";
+	private static final String TAG = "TaskActivity";
 	private AppContext context;
 	private ListFragment mFrag;
 	private ListView listView;
@@ -136,21 +139,33 @@ public class TaskActivity extends SlidingFragmentActivity {
 									.getContent(), "UTF-8"));
 					results = reader.readLine();
 					Gson gson = new Gson();
+					SharedPreferences shared = getSharedPreferences(AppContext.PREFS_NAME, MODE_PRIVATE);
+					Editor editor = shared.edit();
 					if (results != null) {
 						TaskModel[] tasks = gson.fromJson(results,
 								TaskModel[].class);
 						String[] values = new String[tasks.length];
+						editor.putInt("overall", tasks.length);
+						int accepted = 0;
 						for (int i = 0; i < tasks.length; i++) {
 							if (tasks[i].isStatus()) {
 								values[i] = tasks[i].getTaskId() + "_"
 										+ tasks[i].getDescription() + "(¡Ì)";
+								accepted++;
 							} else {
 								values[i] = tasks[i].getTaskId() + "_"
 										+ tasks[i].getDescription() + "(X)";
 								context.setTaskdescription(tasks[i].getDescription());
 							}
 						}
-
+						editor.putInt("acceptAmount",accepted );
+						if(tasks.length!=0){
+							float acceptance = Calculation.acceptance(accepted, tasks.length);
+							editor.putFloat("accept", acceptance);
+							editor.commit();
+							context.setAcceptPercent(acceptance);
+						}
+						
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 								context, android.R.layout.simple_list_item_1,
 								android.R.id.text1, values);

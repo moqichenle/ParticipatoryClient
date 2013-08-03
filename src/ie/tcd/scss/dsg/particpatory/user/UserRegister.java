@@ -175,7 +175,7 @@ public class UserRegister extends Activity {
 			u.setLongitude(location.getLongitude());
 			u.setSpeed(location.getSpeed());
 
-			u.setMode("Still");
+			u.setMode("still");
 			u.setRegisterId(GCMRegistrar
 					.getRegistrationId(getApplicationContext()));
 			u.setStreetName("Pearse Street");

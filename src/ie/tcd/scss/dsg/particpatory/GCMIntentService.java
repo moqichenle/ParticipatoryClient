@@ -144,7 +144,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 				R.drawable.task);
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				this).setLargeIcon(bm).setSmallIcon(R.drawable.task)
-				.setContentTitle("A New Task!").setContentText(message.subSequence(0, 10))
+				.setContentTitle("A New Task!").setContentText(message.subSequence(0, 20))
 				.setWhen(System.currentTimeMillis()).setAutoCancel(true);
 		
 		Intent resultIntent = new Intent(this, NewTaskActivity.class);
@@ -329,12 +329,12 @@ public class GCMIntentService extends GCMBaseIntentService {
 		startActivity(intent);
 	}
 
-	private String getWebSampleUrl(String endpointUrl) {
-		// Not the most elegant solution; we'll improve this in the future
-		if (CloudEndpointUtils.LOCAL_ANDROID_RUN) {
-			return CloudEndpointUtils.LOCAL_APP_ENGINE_SERVER_URL
-					+ "index.html";
-		}
-		return endpointUrl.replace("/_ah/api/", "/index.html");
-	}
+//	private String getWebSampleUrl(String endpointUrl) {
+//		// Not the most elegant solution; we'll improve this in the future
+//		if (CloudEndpointUtils.LOCAL_ANDROID_RUN) {
+//			return CloudEndpointUtils.LOCAL_APP_ENGINE_SERVER_URL
+//					+ "index.html";
+//		}
+//		return endpointUrl.replace("/_ah/api/", "/index.html");
+//	}
 }
