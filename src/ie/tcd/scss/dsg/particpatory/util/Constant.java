@@ -21,7 +21,7 @@ import android.os.StrictMode;
 import com.google.gson.Gson;
 
 public class Constant {
-	public static String url = "http://192.168.1.10:8888";// 10.6.33.177
+	public static String url = "http://participatorysensing.appspot.com";// 10.6.33.177
 															// 192.168.1.10
 	public static int activityDetectedTimes = 0;
 

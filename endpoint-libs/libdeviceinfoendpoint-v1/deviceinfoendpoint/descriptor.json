@@ -1,11 +1,13 @@
 {
   "files": [
     {
-      "path": "myapp-deviceinfoendpoint-v1-20130619111648-java-1.15.0-rc-sources.jar", 
-      "type": "source"
+      "downloadUrl": "/downloads/deviceinfoendpoint/v1/20130805195018/java/1.15.0-rc/participatorysensing-deviceinfoendpoint-v1-20130805195018-java-1.15.0-rc-sources.jar", 
+      "path": "participatorysensing-deviceinfoendpoint-v1-20130805195018-java-1.15.0-rc-sources.jar", 
+      "type": "source", 
+      "timestamp": "2013-08-05 19:50"
     }, 
     {
-      "path": "myapp-deviceinfoendpoint-v1-20130619111648-java-1.15.0-rc.jar.properties", 
+      "path": "participatorysensing-deviceinfoendpoint-v1-20130805195018-java-1.15.0-rc.jar.properties", 
       "type": "android.properties"
     }
   ], 
@@ -689,7 +691,7 @@
     }
   ], 
   "language_version": "1.15.0-rc", 
-  "revision": 20130619111648, 
+  "revision": 20130805195018, 
   "id": "deviceinfoendpoint:v1", 
   "modulePath": "ie/tcd/scss/dsg/particpatory"
 }

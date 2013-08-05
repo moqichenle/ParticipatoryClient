@@ -35,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -164,6 +165,9 @@ public class TaskActivity extends SlidingFragmentActivity {
 							editor.putFloat("accept", acceptance);
 							editor.commit();
 							context.setAcceptPercent(acceptance);
+						}else{
+							Toast.makeText(getApplicationContext(),
+									"No Tasks", Toast.LENGTH_LONG).show();
 						}
 						
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(

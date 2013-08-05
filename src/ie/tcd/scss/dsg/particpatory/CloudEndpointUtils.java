@@ -33,13 +33,13 @@ public class CloudEndpointUtils {
    * http://developers.google.com/eclipse/docs/cloud_endpoints for more
    * information.
    */
-  protected static final boolean LOCAL_ANDROID_RUN = true;
+  protected static final boolean LOCAL_ANDROID_RUN = false;
 
   /*
    * The root URL of where your DevAppServer is running (if you're running the
    * DevAppServer locally).
    */
-  protected static final String LOCAL_APP_ENGINE_SERVER_URL = "http://localhost:8888/";
+  protected static final String LOCAL_APP_ENGINE_SERVER_URL = Constant.url;//"http://localhost:8888/"
 
   /*
    * The root URL of where your DevAppServer is running when it's being
@@ -62,13 +62,13 @@ public class CloudEndpointUtils {
   public static <B extends AbstractGoogleClient.Builder> B updateBuilder(
       B builder) {
     if (LOCAL_ANDROID_RUN) {
+    	Log.d("LOCAL??????????????", "Local??????????????");
       builder.setRootUrl(LOCAL_APP_ENGINE_SERVER_URL_FOR_ANDROID
           + "/_ah/api/");
     }
 
     // only enable GZip when connecting to remote server
     final boolean enableGZip = builder.getRootUrl().startsWith("https:");
-
     builder.setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
       public void initialize(AbstractGoogleClientRequest<?> request)
           throws IOException {

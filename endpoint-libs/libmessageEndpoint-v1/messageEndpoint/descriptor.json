@@ -1,16 +1,18 @@
 {
   "files": [
     {
-      "path": "myapp-messageEndpoint-v1-20130718114440-java-1.15.0-rc-sources.jar", 
-      "type": "source"
+      "downloadUrl": "/downloads/messageEndpoint/v1/20130805195009/java/1.15.0-rc/participatorysensing-messageEndpoint-v1-20130805195009-java-1.15.0-rc-sources.jar", 
+      "path": "participatorysensing-messageEndpoint-v1-20130805195009-java-1.15.0-rc-sources.jar", 
+      "type": "source", 
+      "timestamp": "2013-08-05 19:50"
     }, 
     {
-      "path": "myapp-messageEndpoint-v1-20130718114440-java-1.15.0-rc.jar.properties", 
+      "path": "participatorysensing-messageEndpoint-v1-20130805195009-java-1.15.0-rc.jar.properties", 
       "type": "android.properties"
     }
   ], 
   "kind": "discovery#directoryItem", 
-  "moduleName": "com.waterdrinkreminder", 
+  "moduleName": "ie.tcd.scss.dsg.particpatory", 
   "name": "messageEndpoint", 
   "language": "java", 
   "proguard-config": "proguard-google-api-client.txt", 
@@ -689,7 +691,7 @@
     }
   ], 
   "language_version": "1.15.0-rc", 
-  "revision": 20130718114440, 
+  "revision": 20130805195009, 
   "id": "messageEndpoint:v1", 
-  "modulePath": "com/waterdrinkreminder"
+  "modulePath": "ie/tcd/scss/dsg/particpatory"
 }

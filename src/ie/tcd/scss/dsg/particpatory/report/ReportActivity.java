@@ -34,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -163,7 +164,10 @@ public class ReportActivity extends SlidingFragmentActivity {
 							values[i] = reports[i].getReportId() + "_"
 									+ reports[i].getContend();
 						}
-
+						if(reports.length==0){
+							Toast.makeText(getApplicationContext(),
+									"No Reports", Toast.LENGTH_LONG).show();
+						}
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 								context, android.R.layout.simple_list_item_1,
 								android.R.id.text1, values);
