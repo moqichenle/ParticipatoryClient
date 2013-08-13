@@ -250,12 +250,18 @@ public class AddReportActivity extends SlidingFragmentActivity {
 								android.R.layout.simple_spinner_item);
 				keywords.setAdapter(tra_key);
 				categoryId = 0;
-			} else {
+			}  else if (category.equals("Impression")) {
+				ArrayAdapter<CharSequence> tra_key = ArrayAdapter
+						.createFromResource(context, R.array.tra_keyword_array,
+								android.R.layout.simple_spinner_item);
+				keywords.setAdapter(tra_key);
+				categoryId = 1;
+			}else {
 				ArrayAdapter<CharSequence> imp_key = ArrayAdapter
 						.createFromResource(context, R.array.imp_keyword_array,
 								android.R.layout.simple_spinner_item);
 				keywords.setAdapter(imp_key);
-				categoryId = 1;
+				categoryId = 2;
 			}
 		}
 
