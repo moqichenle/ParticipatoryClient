@@ -5,6 +5,8 @@ import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
+import ie.tcd.scss.dsg.particpatory.util.LocationUtil;
+import ie.tcd.scss.dsg.particpatory.util.LocationUtil.LocationResult;
 import ie.tcd.scss.dsg.po.ReportFromApp;
 import ie.tcd.scss.dsg.po.User;
 
@@ -90,6 +92,18 @@ public class AddReportActivity extends SlidingFragmentActivity {
 		finding = (ImageView) findViewById(R.id.locationIcon);
 
 		local = context.getLocation();
+		if (local == null) {
+			LocationResult locationResult = new LocationResult() {
+				@Override
+				public void gotLocation(Location location) {
+					context.setLocation(location);
+					local = location;
+				}
+			};
+			LocationUtil updatedLocation = new LocationUtil();
+			updatedLocation
+					.getLocation(getApplicationContext(), locationResult);
+		}
 		Log.d(TAG, "get location already?" + context.getLocation());
 		if (local != null && local.hasAccuracy() && local.getAccuracy() <= 50) {
 			finding.setImageResource(R.drawable.accept);
@@ -252,7 +266,7 @@ public class AddReportActivity extends SlidingFragmentActivity {
 				categoryId = 0;
 			}  else if (category.equals("Impression")) {
 				ArrayAdapter<CharSequence> tra_key = ArrayAdapter
-						.createFromResource(context, R.array.tra_keyword_array,
+						.createFromResource(context, R.array.imp_keyword_array,
 								android.R.layout.simple_spinner_item);
 				keywords.setAdapter(tra_key);
 				categoryId = 1;

@@ -5,6 +5,8 @@ import ie.tcd.scss.dsg.particpatory.R;
 import ie.tcd.scss.dsg.particpatory.SampleListFragment;
 import ie.tcd.scss.dsg.particpatory.util.Calculation;
 import ie.tcd.scss.dsg.particpatory.util.Constant;
+import ie.tcd.scss.dsg.particpatory.util.LocationUtil;
+import ie.tcd.scss.dsg.particpatory.util.LocationUtil.LocationResult;
 import ie.tcd.scss.dsg.po.Query;
 import ie.tcd.scss.dsg.po.User;
 
@@ -82,12 +84,24 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 		category.setOnItemSelectedListener(this.selectCategory);
 
 		local = context.getLocation();
+		if (local == null) {
+			LocationResult locationResult = new LocationResult() {
+				@Override
+				public void gotLocation(Location location) {
+					context.setLocation(location);
+					local = location;
+				}
+			};
+			LocationUtil updatedLocation = new LocationUtil();
+			updatedLocation
+					.getLocation(getApplicationContext(), locationResult);
+		}
 		finding = (ImageView) findViewById(R.id.query_locationing);
 		TextView textView = (TextView) findViewById(R.id.textView1);
 		formatted_address = Constant.getLocationInfo(local.getLatitude(),
 				local.getLongitude());
 		textView.setText(formatted_address);
-		if(local.hasAccuracy()&&local.getAccuracy()<=50){
+		if (local.hasAccuracy() && local.getAccuracy() <= 50) {
 			finding.setImageResource(R.drawable.accept);
 		}
 		location_of_interest = (AutoCompleteTextView) findViewById(R.id.query_location_input);
@@ -130,9 +144,9 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 				categoryId = 0;
 			} else if (category.equals("Impression")) {
 				categoryId = 1;
-			}else if (category.equals("Queue")){
+			} else if (category.equals("Queue")) {
 				categoryId = 2;
-			}else{
+			} else {
 				categoryId = -1;
 			}
 		}
@@ -169,7 +183,7 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 					}
 					newQuery.setCategoryId(categoryId);
 					String content = "would like to know the "
-							+ Constant.getCategoryName(categoryId) + "at "
+							+ Constant.getCategoryName(categoryId) + " at "
 							+ location_of_interest.getText().toString();
 					newQuery.setContent(content);
 					getLocationFromStreetName(location_of_interest.getText()
@@ -223,9 +237,9 @@ public class AddQueryActivity extends SlidingFragmentActivity {
 		} else if (context.getMode().equals("in_vehicle")) {
 			driveSpeed = Calculation.averageDriveSpeed(driveSpeed, newSpeed);
 			currentUser.setAverDriveSpeed(driveSpeed);
-		}else{
+		} else {
 			currentUser.setAverWalkSpeed(context.getAverWalkSpeed());
-			currentUser.setAverDriveSpeed( context.getAverDriveSpeed());
+			currentUser.setAverDriveSpeed(context.getAverDriveSpeed());
 			currentUser.setAverCycleSpeed(context.getAverCycleSpeed());
 		}
 

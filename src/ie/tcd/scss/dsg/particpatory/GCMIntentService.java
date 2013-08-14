@@ -144,7 +144,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 				R.drawable.task);
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				this).setLargeIcon(bm).setSmallIcon(R.drawable.task)
-				.setContentTitle("A New Task!").setContentText(message.subSequence(0, 20))
+				.setContentTitle("A New Task!").setContentText(message.subSequence(0, 40))
 				.setWhen(System.currentTimeMillis()).setAutoCancel(true);
 		
 		Intent resultIntent = new Intent(this, NewTaskActivity.class);

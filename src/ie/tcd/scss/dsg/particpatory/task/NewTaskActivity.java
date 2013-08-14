@@ -149,7 +149,7 @@ public class NewTaskActivity extends SlidingFragmentActivity {
 			currentUser.setLatitude(local.getLatitude());
 			currentUser.setLongitude(local.getLongitude());
 			currentUser.setSpeed(local.getSpeed());
-
+			currentUser.setMode(context.getMode());
 			boolean flag = false;
 			flag = submitTask(task);
 			if (flag) {
