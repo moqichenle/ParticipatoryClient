@@ -184,7 +184,7 @@ public class ActivityRecognitionIntentService extends IntentService {
 					}
 					context.setMode(detectedMode);
 					Intent i = new Intent("ie.tcd.scss.dsg.particpatory.UPDATE");
-					i.putExtra(RECOGNITION_RESULT, detectedMode+"/"+newSpeed);
+					i.putExtra(RECOGNITION_RESULT, detectedMode);
 					editor.putString("mode", detectedMode);
 					editor.commit();
 					editor.commit();

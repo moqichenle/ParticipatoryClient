@@ -96,7 +96,7 @@ public class UserRegister extends Activity {
 			Log.d(TAG, "nickName:" + nickName);
 			if ((local != null) && local.hasAccuracy()
 					&& (local.getAccuracy() <= 50)) {
-				Log.d(TAG, "get location good enough");
+				Log.d(TAG, "get location good enough,please wait for loading proper location.:)");
 				Log.d(TAG, local.getAccuracy() + "");
 
 				String url = Constant.url + "/newuser";
